@@ -12,6 +12,7 @@ import com.aradata.plaidapp.service.content.YoutubeContentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -35,7 +36,8 @@ public class YoutubeController {
 
 	@PostMapping
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
-	public ResponseEntity<?> createPoll(@Valid @RequestBody YoutubeContentRequest youtubeContentRequest) {
+	@Transactional
+	public ResponseEntity<?> createYoutubeContent(@Valid @RequestBody YoutubeContentRequest youtubeContentRequest) {
 		YoutubeContent content = service.createYoutubeContent(youtubeContentRequest);
 
 		URI location = ServletUriComponentsBuilder
@@ -48,7 +50,7 @@ public class YoutubeController {
 
 	@GetMapping("/{contentId}")
 	public YoutubeContentResponse getPollById(@CurrentUser UserPrincipal currentUser,
-	                                @PathVariable String youtubeContentId) {
+	                                @PathVariable("contentId") String youtubeContentId) {
 		return service.getYoutubeContentById(youtubeContentId, currentUser);
 	}
 }

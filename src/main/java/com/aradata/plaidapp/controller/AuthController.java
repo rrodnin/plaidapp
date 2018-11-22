@@ -22,9 +22,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import javax.annotation.PostConstruct;
 import javax.validation.Valid;
 import java.net.URI;
 import java.util.Collections;
+import java.util.HashSet;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -41,6 +43,18 @@ public class AuthController {
 
 	@Autowired
 	JwtTokenProvider tokenProvider;
+
+	@PostConstruct
+	public void init() {
+		userRepository.deleteAll();
+		AppUser admin = new AppUser("admin", "admin", "test@mail.ru", "rodnyan");
+		admin.setPassword(passwordEncoder.encode("rodnyan"));
+		HashSet<Role> roles = new HashSet<>();
+		roles.add(Role.ROLE_USER);
+		roles.add(Role.ROLE_ADMIN);
+		admin.setRoles(roles);
+		userRepository.save(admin);
+	}
 
 	@PostMapping("/signin")
 	public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {

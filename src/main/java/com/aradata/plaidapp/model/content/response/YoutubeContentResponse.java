@@ -1,4 +1,4 @@
 package com.aradata.plaidapp.model.content.response;
 
-public class YoutubeContentResponse {
+public class YoutubeContentResponse extends AbstractContentResponse {
 }
