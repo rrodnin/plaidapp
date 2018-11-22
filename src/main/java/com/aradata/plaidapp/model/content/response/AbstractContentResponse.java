@@ -6,9 +6,18 @@ public abstract class AbstractContentResponse {
 
 	protected String id;
 	protected String name;
+	protected int likes;
 	protected String url;
 	protected String description;
 	protected Type type;
+
+	public int getLikes() {
+		return likes;
+	}
+
+	public void setLikes(int likes) {
+		this.likes = likes;
+	}
 
 	public Type getType() {
 		return type;

@@ -44,19 +44,19 @@ public class AuthController {
 	@Autowired
 	JwtTokenProvider tokenProvider;
 
-	@PostConstruct
-	public void init() {
-		userRepository.deleteAll();
-		AppUser admin = new AppUser("admin", "admin", "test@mail.ru", "rodnyan");
-		admin.setPassword(passwordEncoder.encode("rodnyan"));
-		HashSet<Role> roles = new HashSet<>();
-		roles.add(Role.ROLE_USER);
-		roles.add(Role.ROLE_ADMIN);
-		admin.setRoles(roles);
-		userRepository.save(admin);
-	}
+//	@PostConstruct
+//	public void init() {
+//		userRepository.deleteAll();
+//		AppUser admin = new AppUser("admin", "admin", "test@mail.ru", "rodnyan");
+//		admin.setPassword(passwordEncoder.encode("rodnyan"));
+//		HashSet<Role> roles = new HashSet<>();
+//		roles.add(Role.ROLE_USER);
+//		roles.add(Role.ROLE_ADMIN);
+//		admin.setRoles(roles);
+//		userRepository.save(admin);
+//	}
 
-	@PostMapping("/signin")
+	@PostMapping("/login")
 	public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
 
 		Authentication authentication = authenticationManager.authenticate(
@@ -73,7 +73,7 @@ public class AuthController {
 	}
 
 
-	@PostMapping("/signup")
+	@PostMapping("/register")
 	public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
 		if (userRepository.existsByUsername(signUpRequest.getUsername())) {
 			return new ResponseEntity(new ApiResponse(false, "Username is already taken!"),

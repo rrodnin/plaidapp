@@ -11,6 +11,7 @@ public class ModelMapper {
 		response.setName(content.getName());
 		response.setType(content.getType());
 		response.setUrl(content.getUrl());
+		response.likes = content.getLikes();
 		return response;
 	}
 }

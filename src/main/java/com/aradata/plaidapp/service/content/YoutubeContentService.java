@@ -1,6 +1,7 @@
 package com.aradata.plaidapp.service.content;
 
 import com.aradata.plaidapp.model.content.AppConstants;
+import com.aradata.plaidapp.model.content.Type;
 import com.aradata.plaidapp.model.content.YoutubeContent;
 import com.aradata.plaidapp.model.content.request.YoutubeContentRequest;
 import com.aradata.plaidapp.model.content.response.ModelMapper;
@@ -8,8 +9,9 @@ import com.aradata.plaidapp.model.content.response.PagedResponse;
 import com.aradata.plaidapp.model.content.response.YoutubeContentResponse;
 import com.aradata.plaidapp.repository.YoutubeRepository;
 import com.aradata.plaidapp.security.UserPrincipal;
-import exception.BadRequestException;
-import exception.ResourceNotFoundException;
+import com.aradata.plaidapp.exception.BadRequestException;
+import com.aradata.plaidapp.exception.ResourceNotFoundException;
+import com.aradata.plaidapp.service.LikeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -26,6 +28,8 @@ public class YoutubeContentService {
 	@Autowired
 	private YoutubeRepository repository;
 
+	@Autowired
+	private LikeService service;
 
 	public PagedResponse<YoutubeContentResponse> getAllYoutubeContent(UserPrincipal currentUser, int page, int size) {
 		validatePageNumberAndSize(page, size);
@@ -39,9 +43,7 @@ public class YoutubeContentService {
 		}
 
 		List<YoutubeContentResponse> responseList = contents.map(
-				content -> {
-					return ModelMapper.mapYoutubeToYoutubeResponse(content);
-				}
+				ModelMapper::mapYoutubeToYoutubeResponse
 		).getContent();
 
 		return new PagedResponse<>(responseList, contents.getNumber(), contents.getSize(),
@@ -72,5 +74,24 @@ public class YoutubeContentService {
 		if(size > AppConstants.MAX_PAGE_SIZE) {
 			throw new BadRequestException("Page size must not be greater than " + AppConstants.MAX_PAGE_SIZE);
 		}
+	}
+
+
+	public void setLike(UserPrincipal currentUser, String youtubeContentId) {
+		YoutubeContent content = repository.findById(youtubeContentId).orElseThrow(() ->
+				new ResourceNotFoundException("Youtube", "id", youtubeContentId));
+
+		service.setLike(youtubeContentId, currentUser, Type.YOUTUBE);
+		content.setLikes(content.getLikes() + 1);
+		repository.save(content);
+	}
+
+	public void deleteLike(UserPrincipal currentUser, String youtubeContentId) {
+		YoutubeContent content = repository.findById(youtubeContentId).orElseThrow(() ->
+				new ResourceNotFoundException("Youtube", "id", youtubeContentId));
+
+		service.deleteLike(youtubeContentId, currentUser, Type.YOUTUBE);
+		content.setLikes(content.getLikes() - 1);
+		repository.save(content);
 	}
 }
