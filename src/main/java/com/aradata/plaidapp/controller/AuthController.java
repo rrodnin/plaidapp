@@ -1,7 +1,7 @@
 package com.aradata.plaidapp.controller;
 
-import com.aradata.plaidapp.model.AppUser;
-import com.aradata.plaidapp.model.Role;
+import com.aradata.plaidapp.model.user.AppUser;
+import com.aradata.plaidapp.model.user.Role;
 import com.aradata.plaidapp.model.payloads.ApiResponse;
 import com.aradata.plaidapp.model.payloads.JwtAuthenticationResponse;
 import com.aradata.plaidapp.model.payloads.LoginRequest;

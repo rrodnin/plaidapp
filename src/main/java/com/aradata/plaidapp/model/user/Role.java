@@ -1,4 +1,4 @@
-package com.aradata.plaidapp.model;
+package com.aradata.plaidapp.model.user;
 
 public enum Role {
 	ROLE_USER,

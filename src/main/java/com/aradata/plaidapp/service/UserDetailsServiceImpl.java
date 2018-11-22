@@ -1,6 +1,6 @@
 package com.aradata.plaidapp.service;
 
-import com.aradata.plaidapp.model.AppUser;
+import com.aradata.plaidapp.model.user.AppUser;
 import com.aradata.plaidapp.repository.AppUserRepository;
 import com.aradata.plaidapp.security.UserPrincipal;
 import org.springframework.beans.factory.annotation.Autowired;

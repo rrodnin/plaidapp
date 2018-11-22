@@ -1,6 +1,6 @@
 package com.aradata.plaidapp.security;
 
-import com.aradata.plaidapp.model.AppUser;
+import com.aradata.plaidapp.model.user.AppUser;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
