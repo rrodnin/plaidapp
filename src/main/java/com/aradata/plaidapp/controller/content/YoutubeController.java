@@ -10,7 +10,6 @@ import com.aradata.plaidapp.security.CurrentUser;
 import com.aradata.plaidapp.security.UserPrincipal;
 import com.aradata.plaidapp.service.content.YoutubeContentService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,25 +49,25 @@ public class YoutubeController {
 	}
 
 	@GetMapping("/{contentId}")
-	public YoutubeContentResponse getPollById(@CurrentUser UserPrincipal currentUser,
+	public YoutubeContentResponse getYoutubeContentByID(@CurrentUser UserPrincipal currentUser,
 	                                @PathVariable("contentId") String youtubeContentId) {
 		return service.getYoutubeContentById(youtubeContentId, currentUser);
 	}
 
-	@PostMapping("/{contentId}/like")
-	@Transactional
-	public ResponseEntity<?> setLike(@CurrentUser UserPrincipal currentUser,
-	                                 @PathVariable("contentId") String youtubeContentId) {
-
-		service.setLike(currentUser, youtubeContentId);
-		return new ResponseEntity<>(new ApiResponse(true, "Like was added"),  HttpStatus.OK);
-	}
-
-	@DeleteMapping("/{contentId}/like")
-	public ResponseEntity<?> deleteLike(@CurrentUser UserPrincipal currentUser,
-	                                    @PathVariable("contentId") String youtubeContentId) {
-		service.deleteLike(currentUser, youtubeContentId);
-		return new ResponseEntity<>(new ApiResponse(true, "Like was deleted"),  HttpStatus.OK);
-	}
+//	@PostMapping("/{contentId}/like")
+////	@Transactional
+////	public ResponseEntity<?> setLike(@CurrentUser UserPrincipal currentUser,
+////	                                 @PathVariable("contentId") String youtubeContentId) {
+////
+////		service.setLike(currentUser, youtubeContentId);
+////		return new ResponseEntity<>(new ApiResponse(true, "Like was added"),  HttpStatus.OK);
+////	}
+////
+////	@DeleteMapping("/{contentId}/like")
+////	public ResponseEntity<?> deleteLike(@CurrentUser UserPrincipal currentUser,
+////	                                    @PathVariable("contentId") String youtubeContentId) {
+////		service.deleteLike(currentUser, youtubeContentId);
+////		return new ResponseEntity<>(new ApiResponse(true, "Like was deleted"),  HttpStatus.OK);
+////	}
 
 }

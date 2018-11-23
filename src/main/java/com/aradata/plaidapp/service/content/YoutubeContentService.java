@@ -77,21 +77,21 @@ public class YoutubeContentService {
 	}
 
 
-	public void setLike(UserPrincipal currentUser, String youtubeContentId) {
-		YoutubeContent content = repository.findById(youtubeContentId).orElseThrow(() ->
-				new ResourceNotFoundException("Youtube", "id", youtubeContentId));
-
-		service.setLike(youtubeContentId, currentUser, Type.YOUTUBE);
-		content.setLikes(content.getLikes() + 1);
-		repository.save(content);
-	}
-
-	public void deleteLike(UserPrincipal currentUser, String youtubeContentId) {
-		YoutubeContent content = repository.findById(youtubeContentId).orElseThrow(() ->
-				new ResourceNotFoundException("Youtube", "id", youtubeContentId));
-
-		service.deleteLike(youtubeContentId, currentUser, Type.YOUTUBE);
-		content.setLikes(content.getLikes() - 1);
-		repository.save(content);
-	}
+//	public void setLike(UserPrincipal currentUser, String youtubeContentId) {
+//		YoutubeContent content = repository.findById(youtubeContentId).orElseThrow(() ->
+//				new ResourceNotFoundException("Youtube", "id", youtubeContentId));
+//
+//		service.setLike(youtubeContentId, currentUser, Type.YOUTUBE);
+//		content.setLikes(content.getLikes() + 1);
+//		repository.save(content);
+//	}
+//
+//	public void deleteLike(UserPrincipal currentUser, String youtubeContentId) {
+//		YoutubeContent content = repository.findById(youtubeContentId).orElseThrow(() ->
+//				new ResourceNotFoundException("Youtube", "id", youtubeContentId));
+//
+//		service.deleteLike(youtubeContentId, currentUser, Type.YOUTUBE);
+//		content.setLikes(content.getLikes() - 1);
+//		repository.save(content);
+//	}
 }

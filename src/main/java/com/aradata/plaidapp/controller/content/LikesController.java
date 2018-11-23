@@ -1,4 +1,4 @@
-package com.aradata.plaidapp.controller;
+package com.aradata.plaidapp.controller.content;
 
 import com.aradata.plaidapp.model.content.Type;
 import com.aradata.plaidapp.model.content.request.LikeRequest;
@@ -24,12 +24,11 @@ public class LikesController {
 
 
 	@Transactional
-	@PostMapping("/{contentId}")
+	@PostMapping
 	public ResponseEntity<?> setLike(@CurrentUser UserPrincipal currentUser,
-	                                 @PathVariable("contentId") String contentId,
 	                                 @Valid @RequestBody LikeRequest request) {
 
-		service.setLike(contentId, currentUser, request.getType());
+		service.setLike(currentUser, request);
 		return new ResponseEntity<>(new ApiResponse(true, "Like was added"), HttpStatus.OK);
 	}
 
@@ -39,7 +38,7 @@ public class LikesController {
 	public ResponseEntity<?> deleteLike(@CurrentUser UserPrincipal currentUser,
 	                                    @PathVariable("contentId") String contentId,
 	                                    @Valid @RequestBody LikeRequest request) {
-		service.deleteLike(contentId, currentUser, request.getType());
+		service.deleteLike(currentUser, request);
 		return new ResponseEntity<>(new ApiResponse(true, "Like was deleted"), HttpStatus.OK);
 	}
 
