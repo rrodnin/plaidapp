@@ -23,7 +23,7 @@ public class CommentService {
 		Comment comment = new Comment();
 		comment.setOwnerId(currentUser.getId());
 		comment.setContentId(contentId);
-		comment.setText(request.getText());
+		comment.setText(request.getText().trim());
 		repository.save(comment);
 		return comment;
 	}
