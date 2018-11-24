@@ -8,6 +8,7 @@ import com.aradata.plaidapp.model.content.Content;
 import com.aradata.plaidapp.model.content.Image;
 import com.aradata.plaidapp.model.content.request.CommentRequest;
 import com.aradata.plaidapp.model.content.request.ContentRequest;
+import com.aradata.plaidapp.model.content.response.ContentResponse;
 import com.aradata.plaidapp.model.content.response.PagedResponse;
 import com.aradata.plaidapp.model.likes.Like;
 import com.aradata.plaidapp.repository.ContentRepository;
@@ -44,7 +45,7 @@ public class ContentService {
 	private ImageService imageService;
 
 
-	public PagedResponse<Content> fetchAllContent(UserPrincipal currentUser, int page, int size) {
+	public PagedResponse<ContentResponse> fetchAllContent(UserPrincipal currentUser, int page, int size) {
 		validatePageNumberAndSize(page, size);
 
 		Pageable pageable = PageRequest.of(page, size, Sort.Direction.DESC, "createdAt");
@@ -55,7 +56,7 @@ public class ContentService {
 					contents.getSize(), contents.getTotalElements(), contents.getTotalPages());
 		}
 
-		List<Content> responseList = contents.getContent();
+		List<ContentResponse> responseList = contents.map(ContentResponse::createFromContent).getContent();
 
 		return new PagedResponse<>(responseList, contents.getNumber(), contents.getSize(),
 				contents.getTotalElements(), contents.getTotalPages());
@@ -87,10 +88,10 @@ public class ContentService {
 		return content;
 	}
 
-	public Content getContentById(String contentId) {
+	public ContentResponse getContentById(String contentId) {
 		Content content = validateContentId(contentId);
 
-		return content;
+		return ContentResponse.createFromContent(content);
 	}
 
 	public PagedResponse<Comment> fetchComments(UserPrincipal currentUser, String contentId, int page, int size) {
@@ -134,7 +135,7 @@ public class ContentService {
 		repository.save(content);
 	}
 
-	public void addImage(String contentId, MultipartFile file) throws IOException {
+	public String addImage(String contentId, MultipartFile file) throws IOException {
 		Content content = validateContentId(contentId);
 		String store = imageService.store(file);
 		Image image = new Image();
@@ -146,5 +147,7 @@ public class ContentService {
 		image.setId(store);
 		content.addImage(image);
 		repository.save(content);
+
+		return path;
 	}
 }

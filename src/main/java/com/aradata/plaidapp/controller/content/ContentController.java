@@ -5,6 +5,7 @@ import com.aradata.plaidapp.model.content.AppConstants;
 import com.aradata.plaidapp.model.content.Content;
 import com.aradata.plaidapp.model.content.request.CommentRequest;
 import com.aradata.plaidapp.model.content.request.ContentRequest;
+import com.aradata.plaidapp.model.content.response.ContentResponse;
 import com.aradata.plaidapp.model.content.response.PagedResponse;
 import com.aradata.plaidapp.model.payloads.ApiResponse;
 import com.aradata.plaidapp.security.CurrentUser;
@@ -12,11 +13,15 @@ import com.aradata.plaidapp.security.UserPrincipal;
 import com.aradata.plaidapp.service.content.ContentService;
 import com.aradata.plaidapp.service.content.ImageService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.Link;
+import org.springframework.hateoas.Resource;
+import org.springframework.hateoas.Resources;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.*;
 
 import javax.validation.Valid;
 import java.io.IOException;
@@ -35,10 +40,23 @@ public class ContentController {
 	/** ---GENERAL--- **/
 
 	@GetMapping
-	public PagedResponse<Content> getContents(@CurrentUser UserPrincipal currentUser,
-	                                          @RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
-	                                          @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size) {
-		return service.fetchAllContent(currentUser, page, size);
+	public ResponseEntity<?>
+	getContents(@CurrentUser UserPrincipal currentUser,
+	            @RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
+	            @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size) {
+		PagedResponse<ContentResponse> response = service.fetchAllContent(currentUser, page, size);
+		response.getContent().stream()
+				.forEach(contentResponse -> {
+					contentResponse.add(
+							linkTo(methodOn(ContentController.class).getContentById(
+									contentResponse.getContentId()
+							)).withSelfRel());
+				});
+
+		Link link = linkTo(methodOn(ContentController.class).getContents(currentUser, page, size)).withSelfRel();
+		Resource<PagedResponse<ContentResponse>> responseResource = new Resource<>(response, link);
+		return ResponseEntity.ok().body(responseResource);
+
 	}
 
 	@PostMapping
@@ -55,8 +73,8 @@ public class ContentController {
 	}
 
 	@GetMapping("/{contentId}")
-	public Content getContentById(@PathVariable String contentId) {
-		return service.getContentById(contentId);
+	public ResponseEntity<ContentResponse> getContentById(@PathVariable String contentId) {
+		return ResponseEntity.ok().body(service.getContentById(contentId));
 	}
 
 	/** ---COMMENTS--- **/
@@ -105,9 +123,14 @@ public class ContentController {
 
 	@PostMapping("/{contentId}/images")
 	@Transactional
-	public void uploadImage(@PathVariable String contentId,
+	public ResponseEntity<?> uploadImage(@PathVariable String contentId,
 							@RequestParam("file") MultipartFile file) throws IOException {
-		service.addImage(contentId, file);
+		String uriString = service.addImage(contentId, file);
+		URI uri = URI.create(uriString);
+		return ResponseEntity.created(uri).body(new ApiResponse(
+				true,
+				"Image uploaded successfully"
+		));
 	}
 
 

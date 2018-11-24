@@ -1,6 +1,7 @@
 package com.aradata.plaidapp.model.content;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.hateoas.ResourceSupport;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -36,6 +37,8 @@ public class Content {
 	protected LinkedList<Image> images;
 
 	public LinkedList<Image> getImages() {
+		if (images == null)
+			images = new LinkedList<>();
 		return images;
 	}
 

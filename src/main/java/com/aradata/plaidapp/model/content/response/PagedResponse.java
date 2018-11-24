@@ -1,8 +1,9 @@
 package com.aradata.plaidapp.model.content.response;
 
+import java.util.Iterator;
 import java.util.List;
 
-public class PagedResponse<T> {
+public class PagedResponse<T> implements Iterable<T>{
 
 	private List<T> content;
 	private int page;
@@ -56,5 +57,10 @@ public class PagedResponse<T> {
 
 	public void setTotalPages(int totalPages) {
 		this.totalPages = totalPages;
+	}
+
+	@Override
+	public Iterator<T> iterator() {
+		return content.iterator();
 	}
 }
