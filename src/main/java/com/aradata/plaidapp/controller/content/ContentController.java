@@ -6,7 +6,6 @@ import com.aradata.plaidapp.model.content.Content;
 import com.aradata.plaidapp.model.content.request.CommentRequest;
 import com.aradata.plaidapp.model.content.request.ContentRequest;
 import com.aradata.plaidapp.model.content.response.PagedResponse;
-import com.aradata.plaidapp.model.likes.Like;
 import com.aradata.plaidapp.model.payloads.ApiResponse;
 import com.aradata.plaidapp.security.CurrentUser;
 import com.aradata.plaidapp.security.UserPrincipal;
