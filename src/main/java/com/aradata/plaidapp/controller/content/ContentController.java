@@ -6,6 +6,7 @@ import com.aradata.plaidapp.model.content.Content;
 import com.aradata.plaidapp.model.content.request.CommentRequest;
 import com.aradata.plaidapp.model.content.request.ContentRequest;
 import com.aradata.plaidapp.model.content.response.PagedResponse;
+import com.aradata.plaidapp.model.likes.Like;
 import com.aradata.plaidapp.model.payloads.ApiResponse;
 import com.aradata.plaidapp.security.CurrentUser;
 import com.aradata.plaidapp.security.UserPrincipal;
@@ -80,5 +81,21 @@ public class ContentController {
 	}
 
 	/** ---LIKES--- **/
+	@PostMapping("/{contentId}/likes")
+	@Transactional
+	public ResponseEntity<?> createLike(@PathVariable String contentId,
+	                                    @CurrentUser UserPrincipal currentUser) {
+			service.createLike(contentId, currentUser);
+			return ResponseEntity.ok().body(new ApiResponse(true, "Like was created"));
+	}
+
+	@DeleteMapping("/{contentId}/likes")
+	@Transactional
+	public ResponseEntity<?> deleteLike(@PathVariable String contentId,
+	                                    @CurrentUser UserPrincipal currentUser) {
+		service.deleteLike(contentId, currentUser);
+		return ResponseEntity.ok().body(new ApiResponse(true, "Like was deleted"));
+	}
+
 
 }

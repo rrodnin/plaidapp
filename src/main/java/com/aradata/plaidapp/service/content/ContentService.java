@@ -8,9 +8,11 @@ import com.aradata.plaidapp.model.content.Content;
 import com.aradata.plaidapp.model.content.request.CommentRequest;
 import com.aradata.plaidapp.model.content.request.ContentRequest;
 import com.aradata.plaidapp.model.content.response.PagedResponse;
+import com.aradata.plaidapp.model.likes.Like;
 import com.aradata.plaidapp.repository.ContentRepository;
 import com.aradata.plaidapp.security.UserPrincipal;
 import com.aradata.plaidapp.service.comment.CommentService;
+import com.aradata.plaidapp.service.likes.LikeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -30,6 +32,9 @@ public class ContentService {
 
 	@Autowired
 	private CommentService commentService;
+
+	@Autowired
+	private LikeService likeService;
 
 
 	public PagedResponse<Content> fetchAllContent(UserPrincipal currentUser, int page, int size) {
@@ -59,6 +64,11 @@ public class ContentService {
 		}
 	}
 
+	private Content validateContentId(String contentId) {
+		return repository.findById(contentId).orElseThrow(() ->
+				new ResourceNotFoundException("Content", "id", contentId));
+	}
+
 	public Content createContent(@Valid ContentRequest contentRequest) {
 		Content content = new Content();
 		content.setText(contentRequest.getText());
@@ -71,14 +81,14 @@ public class ContentService {
 	}
 
 	public Content getContentById(String contentId) {
-		Content content = repository.findById(contentId).orElseThrow(() ->
-				new ResourceNotFoundException("Content", "id", contentId));
+		Content content = validateContentId(contentId);
 
 		return content;
 	}
 
 	public PagedResponse<Comment> fetchComments(UserPrincipal currentUser, String contentId, int page, int size) {
 		validatePageNumberAndSize(page, size);
+		validateContentId(contentId);
 		Pageable pageable = PageRequest.of(page, size, Sort.Direction.DESC, "createdAt");
 
 		Page<Comment> comments = commentService.findAllByContentId(pageable, contentId);
@@ -96,6 +106,24 @@ public class ContentService {
 	}
 
 	public Comment createComment(UserPrincipal currentUser, CommentRequest request, String contentId) {
+		validateContentId(contentId);
 		return commentService.createComment(currentUser, request, contentId);
+	}
+
+	public Like createLike(String contentId, UserPrincipal currentUser) {
+		validateContentId(contentId);
+		Like like = likeService.createLike(contentId, currentUser);
+		Content content = repository.findById(contentId).get();
+		content.setLikes(content.getLikes() + 1);
+		repository.save(content);
+		return like;
+	}
+
+	public void deleteLike(String contentId, UserPrincipal currentUser) {
+		validateContentId(contentId);
+		likeService.deleteLike(contentId, currentUser);
+		Content content = repository.findById(contentId).get();
+		content.setLikes(content.getLikes() - 1);
+		repository.save(content);
 	}
 }

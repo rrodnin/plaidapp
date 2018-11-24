@@ -30,6 +30,16 @@ public class Content {
 	@NotBlank
 	protected String text;
 
+	protected int likes = 0;
+
+	public int getLikes() {
+		return likes;
+	}
+
+	public void setLikes(int likes) {
+		this.likes = likes;
+	}
+
 	protected Date createdAt = new Date();
 
 	public String getId() {
