@@ -19,8 +19,15 @@ public class Content {
 	protected Type type;
 
 	@NotNull
+	@NotBlank
 	protected String url;
+
+	@NotNull
+	@NotBlank
 	protected String description;
+
+	@NotNull
+	@NotBlank
 	protected String text;
 
 	protected Date createdAt = new Date();

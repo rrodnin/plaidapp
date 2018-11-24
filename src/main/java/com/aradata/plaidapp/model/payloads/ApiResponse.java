@@ -2,11 +2,14 @@ package com.aradata.plaidapp.model.payloads;
 
 public class ApiResponse {
 	private Boolean success;
+	private String status;
 	private String message;
 
 	public ApiResponse(Boolean success, String message) {
 		this.success = success;
 		this.message = message;
+		if (success)
+				status = "OK";
 	}
 
 	public Boolean getSuccess() {

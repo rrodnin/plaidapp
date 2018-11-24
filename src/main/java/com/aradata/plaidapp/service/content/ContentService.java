@@ -2,12 +2,15 @@ package com.aradata.plaidapp.service.content;
 
 import com.aradata.plaidapp.exception.BadRequestException;
 import com.aradata.plaidapp.exception.ResourceNotFoundException;
+import com.aradata.plaidapp.model.comments.Comment;
 import com.aradata.plaidapp.model.content.AppConstants;
 import com.aradata.plaidapp.model.content.Content;
+import com.aradata.plaidapp.model.content.request.CommentRequest;
 import com.aradata.plaidapp.model.content.request.ContentRequest;
 import com.aradata.plaidapp.model.content.response.PagedResponse;
 import com.aradata.plaidapp.repository.ContentRepository;
 import com.aradata.plaidapp.security.UserPrincipal;
+import com.aradata.plaidapp.service.comment.CommentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -24,6 +27,10 @@ public class ContentService {
 
 	@Autowired
 	private ContentRepository repository;
+
+	@Autowired
+	private CommentService commentService;
+
 
 	public PagedResponse<Content> fetchAllContent(UserPrincipal currentUser, int page, int size) {
 		validatePageNumberAndSize(page, size);
@@ -68,5 +75,27 @@ public class ContentService {
 				new ResourceNotFoundException("Content", "id", contentId));
 
 		return content;
+	}
+
+	public PagedResponse<Comment> fetchComments(UserPrincipal currentUser, String contentId, int page, int size) {
+		validatePageNumberAndSize(page, size);
+		Pageable pageable = PageRequest.of(page, size, Sort.Direction.DESC, "createdAt");
+
+		Page<Comment> comments = commentService.findAllByContentId(pageable, contentId);
+
+		if(comments.getNumberOfElements() == 0) {
+			return new PagedResponse<>(Collections.emptyList(), comments.getNumber(),
+					comments.getSize(), comments.getTotalElements(), comments.getTotalPages());
+		}
+
+		List<Comment> responseList = comments.getContent();
+
+		return new PagedResponse<>(responseList, comments.getNumber(), comments.getSize(),
+				comments.getTotalElements(), comments.getTotalPages());
+
+	}
+
+	public Comment createComment(UserPrincipal currentUser, CommentRequest request, String contentId) {
+		return commentService.createComment(currentUser, request, contentId);
 	}
 }
