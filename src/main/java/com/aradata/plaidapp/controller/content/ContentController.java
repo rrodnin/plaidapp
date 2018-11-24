@@ -10,22 +10,27 @@ import com.aradata.plaidapp.model.payloads.ApiResponse;
 import com.aradata.plaidapp.security.CurrentUser;
 import com.aradata.plaidapp.security.UserPrincipal;
 import com.aradata.plaidapp.service.content.ContentService;
+import com.aradata.plaidapp.service.content.ImageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
+import java.io.IOException;
 import java.net.URI;
 
 @RestController
-@RequestMapping("/api/content")
+@RequestMapping("/api/contents")
 public class ContentController {
 
 	@Autowired
 	private ContentService service;
 
+	@Autowired
+	private ImageService imageService;
 
 	/** ---GENERAL--- **/
 
@@ -94,6 +99,15 @@ public class ContentController {
 	                                    @CurrentUser UserPrincipal currentUser) {
 		service.deleteLike(contentId, currentUser);
 		return ResponseEntity.ok().body(new ApiResponse(true, "Like was deleted"));
+	}
+
+	/** ---IMAGES--- **/
+
+	@PostMapping("/{contentId}/images")
+	@Transactional
+	public void uploadImage(@PathVariable String contentId,
+							@RequestParam("file") MultipartFile file) throws IOException {
+		service.addImage(contentId, file);
 	}
 
 

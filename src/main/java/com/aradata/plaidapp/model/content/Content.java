@@ -5,6 +5,7 @@ import org.springframework.data.annotation.Id;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
+import java.util.LinkedList;
 
 public class Content {
 
@@ -31,6 +32,16 @@ public class Content {
 	protected String text;
 
 	protected int likes = 0;
+
+	protected LinkedList<Image> images;
+
+	public LinkedList<Image> getImages() {
+		return images;
+	}
+
+	public void setImages(LinkedList<Image> images) {
+		this.images = images;
+	}
 
 	public int getLikes() {
 		return likes;
@@ -96,5 +107,11 @@ public class Content {
 
 	public void setCreatedAt(Date createdAt) {
 		this.createdAt = createdAt;
+	}
+
+	public void addImage(Image image) {
+		if (images == null)
+			images = new LinkedList<>();
+		images.add(image);
 	}
 }

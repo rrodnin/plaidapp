@@ -5,6 +5,7 @@ import com.aradata.plaidapp.exception.ResourceNotFoundException;
 import com.aradata.plaidapp.model.comments.Comment;
 import com.aradata.plaidapp.model.content.AppConstants;
 import com.aradata.plaidapp.model.content.Content;
+import com.aradata.plaidapp.model.content.Image;
 import com.aradata.plaidapp.model.content.request.CommentRequest;
 import com.aradata.plaidapp.model.content.request.ContentRequest;
 import com.aradata.plaidapp.model.content.response.PagedResponse;
@@ -19,8 +20,11 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
@@ -35,6 +39,9 @@ public class ContentService {
 
 	@Autowired
 	private LikeService likeService;
+
+	@Autowired
+	private ImageService imageService;
 
 
 	public PagedResponse<Content> fetchAllContent(UserPrincipal currentUser, int page, int size) {
@@ -124,6 +131,20 @@ public class ContentService {
 		likeService.deleteLike(contentId, currentUser);
 		Content content = repository.findById(contentId).get();
 		content.setLikes(content.getLikes() - 1);
+		repository.save(content);
+	}
+
+	public void addImage(String contentId, MultipartFile file) throws IOException {
+		Content content = validateContentId(contentId);
+		String store = imageService.store(file);
+		Image image = new Image();
+
+		String path = ServletUriComponentsBuilder
+				.fromCurrentContextPath().path("/api/images/{imageId}")
+				.buildAndExpand(store).getPath();
+		image.setUrl(path);
+		image.setId(store);
+		content.addImage(image);
 		repository.save(content);
 	}
 }
