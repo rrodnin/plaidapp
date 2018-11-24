@@ -2,28 +2,28 @@ package com.aradata.plaidapp.model.content;
 
 import org.springframework.data.annotation.Id;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 
-public abstract class AbstractContent {
+public class Content {
 
 	@Id
 	protected String id;
 
-	protected int likes;
-	protected String name;
+	@NotNull
+	@NotBlank
+	protected String title;
+
+	@NotNull
 	protected Type type;
+
+	@NotNull
 	protected String url;
 	protected String description;
+	protected String text;
 
 	protected Date createdAt = new Date();
-
-	public Date getCreatedAt() {
-		return createdAt;
-	}
-
-	public void setCreatedAt(Date createdAt) {
-		this.createdAt = createdAt;
-	}
 
 	public String getId() {
 		return id;
@@ -33,20 +33,12 @@ public abstract class AbstractContent {
 		this.id = id;
 	}
 
-	public int getLikes() {
-		return likes;
+	public String getTitle() {
+		return title;
 	}
 
-	public void setLikes(int likes) {
-		this.likes = likes;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
+	public void setTitle(String title) {
+		this.title = title;
 	}
 
 	public Type getType() {
@@ -71,5 +63,21 @@ public abstract class AbstractContent {
 
 	public void setDescription(String description) {
 		this.description = description;
+	}
+
+	public String getText() {
+		return text;
+	}
+
+	public void setText(String text) {
+		this.text = text;
+	}
+
+	public Date getCreatedAt() {
+		return createdAt;
+	}
+
+	public void setCreatedAt(Date createdAt) {
+		this.createdAt = createdAt;
 	}
 }
