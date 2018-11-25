@@ -25,7 +25,7 @@ public class CommentResponse extends ResourceSupport {
 	public static CommentResponse createFromComment(Comment comment) {
 		CommentResponse response = new CommentResponse();
 		response.setCommentId(comment.getId());
-		response.setContentId(comment.getId());
+		response.setContentId(comment.getContentId());
 		response.setCreatedAt(comment.getCreatedAt());
 		response.setOwnerId(comment.getOwnerId());
 		response.setText(comment.getText());

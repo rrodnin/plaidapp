@@ -30,4 +30,8 @@ public class LikeService {
 
 		likeRepository.deleteByContentIdAndOwnerId(contentId, currentUser.getId());
 	}
+
+	public boolean existsByOwnerIdAndContentId(String id, String contentId) {
+		return likeRepository.existsByContentIdAndOwnerId(contentId, id);
+	}
 }

@@ -92,7 +92,7 @@ public class ContentController {
 	@GetMapping("/{contentId}")
 	public ResponseEntity<ContentResponse> getContentById(@CurrentUser UserPrincipal currentUser,
 	                                                      @PathVariable String contentId) {
-		ContentResponse content = service.getContentById(contentId);
+		ContentResponse content = service.getContentById(currentUser, contentId);
 		content.add(
 				linkTo(methodOn(ContentController.class).getContentById(
 						currentUser,content.getContentId()

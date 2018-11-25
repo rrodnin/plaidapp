@@ -61,7 +61,9 @@ public class ContentService {
 					contents.getSize(), contents.getTotalElements(), contents.getTotalPages());
 		}
 
-		List<ContentResponse> responseList = contents.map(ContentResponse::createFromContent).getContent();
+		List<ContentResponse> responseList = contents.map(content ->
+				createContentResponseFromContent(currentUser.getId(),content)).getContent();
+
 
 		return new PagedResponse<>(responseList, contents.getNumber(), contents.getSize(),
 				contents.getTotalElements(), contents.getTotalPages());
@@ -93,10 +95,16 @@ public class ContentService {
 		return content;
 	}
 
-	public ContentResponse getContentById(String contentId) {
+	public ContentResponse getContentById(UserPrincipal currentUser, String contentId) {
 		Content content = validateContentId(contentId);
 
-		return ContentResponse.createFromContent(content);
+		return createContentResponseFromContent(currentUser.getId(), content);
+	}
+
+	private ContentResponse createContentResponseFromContent(String id, Content content) {
+		ContentResponse fromContent = ContentResponse.createFromContent(content);
+		fromContent.setUserLikes(likeService.existsByOwnerIdAndContentId(id, content.getId()));
+		return fromContent;
 	}
 
 	public PagedResponse<CommentResponse> fetchComments(UserPrincipal currentUser, String contentId, int page, int size) {

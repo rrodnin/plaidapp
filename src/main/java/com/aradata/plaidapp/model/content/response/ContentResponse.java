@@ -22,6 +22,8 @@ public class ContentResponse extends ResourceSupport {
 	protected int likes = 0;
 	protected LinkedList<Image> images;
 
+	protected boolean userLikes;
+
 	public static ContentResponse createFromContent(Content content) {
 		ContentResponse response = new ContentResponse();
 		response.contentId = content.getId();
@@ -33,6 +35,14 @@ public class ContentResponse extends ResourceSupport {
 		response.likes = content.getLikes();
 		response.images = content.getImages();
 		return response;
+	}
+
+	public boolean isUserLikes() {
+		return userLikes;
+	}
+
+	public void setUserLikes(boolean userLikes) {
+		this.userLikes = userLikes;
 	}
 
 	public String getContentId() {
