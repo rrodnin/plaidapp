@@ -198,7 +198,9 @@ public class ContentController {
 	public ResponseEntity<?> uploadImage(@PathVariable String contentId,
 							@RequestParam("file") MultipartFile file) throws IOException {
 		String uriString = service.addImage(contentId, file);
-		URI uri = URI.create(uriString);
+		URI uri = ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/images/{imageId}").buildAndExpand(
+				uriString
+		).toUri();
 		return ResponseEntity.created(uri).body(new ApiResponse(
 				true,
 				"Image uploaded successfully",

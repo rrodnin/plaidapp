@@ -161,13 +161,13 @@ public class ContentService {
 
 		String path = ServletUriComponentsBuilder
 				.fromCurrentContextPath().path("/api/images/{imageId}")
-				.buildAndExpand(store).getPath();
+				.buildAndExpand(store).toUriString();
 		image.setUrl(path);
 		image.setId(store);
 		content.addImage(image);
 		repository.save(content);
 
-		return path;
+		return store;
 	}
 
 	public Content getContentById(String contentId) {
