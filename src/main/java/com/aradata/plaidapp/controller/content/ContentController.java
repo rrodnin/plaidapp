@@ -1,6 +1,7 @@
 package com.aradata.plaidapp.controller.content;
 
 import com.aradata.plaidapp.model.comments.Comment;
+import com.aradata.plaidapp.model.comments.CommentResponse;
 import com.aradata.plaidapp.model.content.AppConstants;
 import com.aradata.plaidapp.model.content.Content;
 import com.aradata.plaidapp.model.content.request.CommentRequest;
@@ -112,11 +113,23 @@ public class ContentController {
 	/** ---COMMENTS--- **/
 
 	@GetMapping("/{contentId}/comments")
-	public PagedResponse<Comment> getComments(@CurrentUser UserPrincipal currentUser,
+	public ResponseEntity<?> getComments(@CurrentUser UserPrincipal currentUser,
 	                                          @PathVariable String contentId,
 	                                          @RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
 	                                          @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size) {
-		return service.fetchComments(currentUser, contentId, page, size);
+		PagedResponse<CommentResponse> pagedResponse = service.fetchComments(currentUser,contentId,
+																			page, size);
+		Link link = linkTo(methodOn(ContentController.class).getComments(currentUser, contentId, page, size)).withSelfRel();
+		Link linkToNext = linkTo(methodOn(ContentController.class).getComments(currentUser, contentId, page, size)).withRel("next");
+		Link linkToPrev = linkTo(methodOn(ContentController.class).getComments(currentUser, contentId, page, size)).withRel("prev");
+		if (page < pagedResponse.getTotalPages() - 1) {
+			linkToNext = linkTo(methodOn(ContentController.class).getContents(currentUser, page+1, size)).withRel("next");
+		}
+		if (page > 0) {
+			linkToPrev = linkTo(methodOn(ContentController.class).getContents(currentUser, page-1, size)).withRel("prev");
+		}
+		Resource<PagedResponse<CommentResponse>> responseResource = new Resource<>(pagedResponse, link, linkToNext, linkToPrev);
+		return ResponseEntity.ok().body(responseResource);
 	}
 
 	@PostMapping("/{contentId}/comments")

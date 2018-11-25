@@ -3,6 +3,7 @@ package com.aradata.plaidapp.service.content;
 import com.aradata.plaidapp.exception.BadRequestException;
 import com.aradata.plaidapp.exception.ResourceNotFoundException;
 import com.aradata.plaidapp.model.comments.Comment;
+import com.aradata.plaidapp.model.comments.CommentResponse;
 import com.aradata.plaidapp.model.content.AppConstants;
 import com.aradata.plaidapp.model.content.Content;
 import com.aradata.plaidapp.model.content.Image;
@@ -13,6 +14,7 @@ import com.aradata.plaidapp.model.payloads.PagedResponse;
 import com.aradata.plaidapp.model.likes.Like;
 import com.aradata.plaidapp.repository.ContentRepository;
 import com.aradata.plaidapp.security.UserPrincipal;
+import com.aradata.plaidapp.service.UsersService;
 import com.aradata.plaidapp.service.comment.CommentService;
 import com.aradata.plaidapp.service.likes.LikeService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +45,9 @@ public class ContentService {
 
 	@Autowired
 	private ImageService imageService;
+
+	@Autowired
+	private UsersService usersService;
 
 
 	public PagedResponse<ContentResponse> fetchAllContent(UserPrincipal currentUser, int page, int size) {
@@ -94,7 +99,7 @@ public class ContentService {
 		return ContentResponse.createFromContent(content);
 	}
 
-	public PagedResponse<Comment> fetchComments(UserPrincipal currentUser, String contentId, int page, int size) {
+	public PagedResponse<CommentResponse> fetchComments(UserPrincipal currentUser, String contentId, int page, int size) {
 		validatePageNumberAndSize(page, size);
 		validateContentId(contentId);
 		Pageable pageable = PageRequest.of(page, size, Sort.Direction.DESC, "createdAt");
@@ -106,7 +111,10 @@ public class ContentService {
 					comments.getSize(), comments.getTotalElements(), comments.getTotalPages());
 		}
 
-		List<Comment> responseList = comments.getContent();
+		List<CommentResponse> responseList = comments.map(CommentResponse::createFromComment).getContent();
+		responseList.forEach(commentResponse -> {
+			commentResponse.setOwnerName(usersService.findById(commentResponse.getOwnerId()).getName());
+		});
 
 		return new PagedResponse<>(responseList, comments.getNumber(), comments.getSize(),
 				comments.getTotalElements(), comments.getTotalPages());
