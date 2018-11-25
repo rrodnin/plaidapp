@@ -1,12 +1,12 @@
 package com.aradata.plaidapp.service.content;
 
 import com.aradata.plaidapp.exception.BadRequestException;
+import com.aradata.plaidapp.exception.ContentAlreadyHasPodcastException;
+import com.aradata.plaidapp.exception.ContentIsNotPodcastException;
 import com.aradata.plaidapp.exception.ResourceNotFoundException;
 import com.aradata.plaidapp.model.comments.Comment;
 import com.aradata.plaidapp.model.comments.CommentResponse;
-import com.aradata.plaidapp.model.content.AppConstants;
-import com.aradata.plaidapp.model.content.Content;
-import com.aradata.plaidapp.model.content.Image;
+import com.aradata.plaidapp.model.content.*;
 import com.aradata.plaidapp.model.content.request.CommentRequest;
 import com.aradata.plaidapp.model.content.request.ContentRequest;
 import com.aradata.plaidapp.model.content.response.ContentResponse;
@@ -168,5 +168,18 @@ public class ContentService {
 		repository.save(content);
 
 		return path;
+	}
+
+	public void storePodcast(String contentId, String podcastId) {
+		Content content = validateContentId(contentId);
+		if (Type.PODCAST != content.getType()) {
+			throw new ContentIsNotPodcastException();
+		}
+		PodcastContent podcastContent = (PodcastContent) content;
+		if (!podcastContent.getPodcastId().isEmpty()) {
+			throw new ContentAlreadyHasPodcastException();
+		}
+		podcastContent.setPodcastId(podcastId);
+		repository.save(podcastContent);
 	}
 }

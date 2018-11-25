@@ -1,6 +1,8 @@
 package com.aradata.plaidapp.service.content;
 
 import com.aradata.plaidapp.exception.ResourceNotFoundException;
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
 import com.mongodb.client.gridfs.model.GridFSFile;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,10 +19,21 @@ import java.io.IOException;
 public class PodcastService {
 
 	@Autowired
+	private ContentService service;
+
+	@Autowired
 	private GridFsOperations operations;
 
-	public String store(MultipartFile file) throws IOException {
+	public String store(MultipartFile file, String contentId) throws IOException {
+		DBObject metaData = new BasicDBObject();
+		((BasicDBObject) metaData).put("type", "podcast");
 		ObjectId store = operations.store(file.getInputStream(), file.getOriginalFilename(), file.getContentType());
+		try {
+			service.storePodcast(contentId, store.toHexString());
+		} catch (Exception e) {
+			operations.delete(new Query(Criteria.where("_id").is(store.toHexString())));
+			throw e;
+		}
 		return store.toHexString();
 	}
 

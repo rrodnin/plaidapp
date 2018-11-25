@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.io.IOException;
 import java.net.URI;
@@ -23,7 +24,7 @@ public class PodcastsController {
 
 	@GetMapping("/{podcastId}")
 	@ResponseBody
-	public ResponseEntity<InputStreamResource> getImage(@PathVariable String podcastId) throws IOException {
+	public ResponseEntity<InputStreamResource> getPodcast(@PathVariable String podcastId) throws IOException {
 		GridFsResource podcast = service.getPodcastById(podcastId);
 		return ResponseEntity.ok()
 				.contentLength(podcast.contentLength())
@@ -33,9 +34,11 @@ public class PodcastsController {
 
 	@PostMapping
 	@Transactional
-	public ResponseEntity<?> uploadImage(@RequestParam("file") MultipartFile file) throws IOException {
-		String uriString = service.store(file);
-		URI uri = URI.create(uriString);
+	public ResponseEntity<?> uploadPodcast(@RequestParam("file") MultipartFile file,
+	                                       @RequestParam("contentId") String contentId) throws IOException {
+		String uriString = service.store(file, contentId);
+		URI uri = ServletUriComponentsBuilder.fromCurrentContextPath()
+				.path("/api/podcasts/{podcastId}").buildAndExpand(uriString).toUri();
 		return ResponseEntity.created(uri).body(new ApiResponse(
 				true,
 				"Podcast uploaded successfully",
