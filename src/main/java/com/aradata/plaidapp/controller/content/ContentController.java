@@ -4,6 +4,7 @@ import com.aradata.plaidapp.model.comments.Comment;
 import com.aradata.plaidapp.model.comments.CommentResponse;
 import com.aradata.plaidapp.model.content.AppConstants;
 import com.aradata.plaidapp.model.content.Content;
+import com.aradata.plaidapp.model.content.Type;
 import com.aradata.plaidapp.model.content.request.CommentRequest;
 import com.aradata.plaidapp.model.content.request.ContentRequest;
 import com.aradata.plaidapp.model.content.response.ContentResponse;
@@ -15,6 +16,7 @@ import com.aradata.plaidapp.security.CurrentUser;
 import com.aradata.plaidapp.security.UserPrincipal;
 import com.aradata.plaidapp.service.content.ContentService;
 import com.aradata.plaidapp.service.content.ImageService;
+import com.aradata.plaidapp.service.content.PodcastService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.Resource;
@@ -43,6 +45,9 @@ public class ContentController {
 
 	@Autowired
 	private ImageService imageService;
+
+	@Autowired
+	private PodcastService podcastService;
 
 	/** ---GENERAL--- **/
 
@@ -112,6 +117,18 @@ public class ContentController {
 				linkTo(methodOn(ContentController.class).createLike(
 						content.getContentId(), currentUser
 				)).withRel("likes"));
+
+		if (content.getType() == Type.PODCAST) {
+			try {
+				String podcastIdByContentId = podcastService.getPodcastIdByContentId(content.getContentId());
+				if (!podcastIdByContentId.isEmpty()) {
+					content.add(linkTo(methodOn(PodcastsController.class)
+							.getPodcast(podcastIdByContentId)).withRel("podcast"));
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 
 
 		return ResponseEntity.ok().body(content);

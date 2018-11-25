@@ -1,6 +1,9 @@
 package com.aradata.plaidapp.service.content;
 
+import com.aradata.plaidapp.exception.ContentIsNotPodcastException;
 import com.aradata.plaidapp.exception.ResourceNotFoundException;
+import com.aradata.plaidapp.model.content.Content;
+import com.aradata.plaidapp.model.content.Type;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import com.mongodb.client.gridfs.model.GridFSFile;
@@ -25,15 +28,13 @@ public class PodcastService {
 	private GridFsOperations operations;
 
 	public String store(MultipartFile file, String contentId) throws IOException {
+		Content contentById = service.getContentById(contentId);
+		if (contentById.getType() != Type.PODCAST)
+			throw new ContentIsNotPodcastException();
 		DBObject metaData = new BasicDBObject();
 		((BasicDBObject) metaData).put("type", "podcast");
+		((BasicDBObject) metaData).put("contentId", contentId);
 		ObjectId store = operations.store(file.getInputStream(), file.getOriginalFilename(), file.getContentType());
-		try {
-			service.storePodcast(contentId, store.toHexString());
-		} catch (Exception e) {
-			operations.delete(new Query(Criteria.where("_id").is(store.toHexString())));
-			throw e;
-		}
 		return store.toHexString();
 	}
 
@@ -45,4 +46,11 @@ public class PodcastService {
 		return operations.getResource(id);
 	}
 
+	public String getPodcastIdByContentId(String contentId) {
+		GridFSFile one = operations.findOne(new Query(Criteria.where("metadata.contentId").is(contentId)));
+		if (one == null) {
+			return "";
+		}
+		return one.getObjectId().toHexString();
+	}
 }

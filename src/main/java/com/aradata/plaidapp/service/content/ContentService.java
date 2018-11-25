@@ -170,16 +170,7 @@ public class ContentService {
 		return path;
 	}
 
-	public void storePodcast(String contentId, String podcastId) {
-		Content content = validateContentId(contentId);
-		if (Type.PODCAST != content.getType()) {
-			throw new ContentIsNotPodcastException();
-		}
-		PodcastContent podcastContent = (PodcastContent) content;
-		if (!podcastContent.getPodcastId().isEmpty()) {
-			throw new ContentAlreadyHasPodcastException();
-		}
-		podcastContent.setPodcastId(podcastId);
-		repository.save(podcastContent);
+	public Content getContentById(String contentId) {
+		return validateContentId(contentId);
 	}
 }
