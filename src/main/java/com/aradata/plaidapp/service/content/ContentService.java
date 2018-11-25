@@ -29,6 +29,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 @Service
@@ -79,7 +80,7 @@ public class ContentService {
 		}
 	}
 
-	private Content validateContentId(String contentId) {
+	public Content validateContentId(String contentId) {
 		return repository.findById(contentId).orElseThrow(() ->
 				new ResourceNotFoundException("Content", "id", contentId));
 	}
@@ -172,5 +173,21 @@ public class ContentService {
 
 	public Content getContentById(String contentId) {
 		return validateContentId(contentId);
+	}
+
+	public PagedResponse<ContentResponse> findAllById(LinkedList<String> ids, int page, int size, UserPrincipal currentUser) {
+		Pageable pageable = PageRequest.of(page, size, Sort.Direction.DESC, "createdAt");
+		Page<Content> contents = repository.findAllById(ids, pageable);
+
+		if(contents.getNumberOfElements() == 0) {
+			return new PagedResponse<>(Collections.emptyList(), contents.getNumber(),
+					contents.getSize(), contents.getTotalElements(), contents.getTotalPages());
+		}
+
+		List<ContentResponse> responseList = contents.map(content ->
+				createContentResponseFromContent(currentUser.getId(),content)).getContent();
+
+		return new PagedResponse<>(responseList, contents.getNumber(), contents.getSize(),
+				contents.getTotalElements(), contents.getTotalPages());
 	}
 }
