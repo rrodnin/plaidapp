@@ -119,19 +119,22 @@ public class ContentService {
 					comments.getSize(), comments.getTotalElements(), comments.getTotalPages());
 		}
 
-		List<CommentResponse> responseList = comments.map(CommentResponse::createFromComment).getContent();
-		responseList.forEach(commentResponse -> {
-			commentResponse.setOwnerName(usersService.findById(commentResponse.getOwnerId()).getName());
-		});
+		List<CommentResponse> responseList = comments.map(comment -> createCommentResponseFromComent(currentUser, comment)).getContent();
 
 		return new PagedResponse<>(responseList, comments.getNumber(), comments.getSize(),
 				comments.getTotalElements(), comments.getTotalPages());
 
 	}
 
-	public Comment createComment(UserPrincipal currentUser, CommentRequest request, String contentId) {
+	public CommentResponse createComment(UserPrincipal currentUser, CommentRequest request, String contentId) {
 		validateContentId(contentId);
-		return commentService.createComment(currentUser, request, contentId);
+		return createCommentResponseFromComent(currentUser,commentService.createComment(currentUser, request, contentId));
+	}
+
+	private CommentResponse createCommentResponseFromComent(UserPrincipal currentUser, Comment comment) {
+		CommentResponse response = CommentResponse.createFromComment(comment);
+		response.setOwnerName(usersService.findById(currentUser.getId()).getName());
+		return response;
 	}
 
 	public Like createLike(String contentId, UserPrincipal currentUser) {

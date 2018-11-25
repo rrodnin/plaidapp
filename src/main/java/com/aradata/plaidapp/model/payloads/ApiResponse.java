@@ -8,11 +8,12 @@ public class ApiResponse<T> {
 
 	private T data;
 
-	public ApiResponse(Boolean success, String message) {
+	public ApiResponse(Boolean success, String message, int code) {
 		this.success = success;
 		this.message = message;
 		if (success)
 				status = "OK";
+		this.code = code;
 	}
 
 

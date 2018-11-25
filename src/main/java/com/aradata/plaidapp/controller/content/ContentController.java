@@ -7,6 +7,8 @@ import com.aradata.plaidapp.model.content.Content;
 import com.aradata.plaidapp.model.content.request.CommentRequest;
 import com.aradata.plaidapp.model.content.request.ContentRequest;
 import com.aradata.plaidapp.model.content.response.ContentResponse;
+import com.aradata.plaidapp.model.payloads.ErrorObject;
+import com.aradata.plaidapp.model.payloads.ErrorResponse;
 import com.aradata.plaidapp.model.payloads.PagedResponse;
 import com.aradata.plaidapp.model.payloads.ApiResponse;
 import com.aradata.plaidapp.security.CurrentUser;
@@ -16,8 +18,12 @@ import com.aradata.plaidapp.service.content.ImageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.Resource;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -26,6 +32,7 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.*;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/contents")
@@ -86,7 +93,7 @@ public class ContentController {
 				.buildAndExpand(content.getId()).toUri();
 
 		return ResponseEntity.created(location)
-				.body(new ApiResponse(true, "Content Created Successfully"));
+				.body(new ApiResponse(true, "Content Created Successfully", 201));
 	}
 
 	@GetMapping("/{contentId}")
@@ -137,14 +144,17 @@ public class ContentController {
 	public ResponseEntity<?> createComment(@PathVariable String contentId,
 											@CurrentUser UserPrincipal currentUser,
 	                                       @Valid @RequestBody CommentRequest request) {
-		Comment comment = service.createComment(currentUser, request, contentId);
+		CommentResponse comment = service.createComment(currentUser, request, contentId);
 
 		URI location = ServletUriComponentsBuilder
 				.fromCurrentContextPath().path("/api/comments/{commentId}")
-				.buildAndExpand(comment.getId()).toUri();
+				.buildAndExpand(comment.getCommentId()).toUri();
+
+		ApiResponse<CommentResponse> apiResponse = new ApiResponse<>(true, "Comment created successfully", 201);
+		apiResponse.setData(comment);
 
 		return ResponseEntity.created(location)
-				.body(new ApiResponse(true, "Comment created successfully"));
+				.body(apiResponse);
 	}
 
 	/** ---LIKES--- **/
@@ -153,7 +163,7 @@ public class ContentController {
 	public ResponseEntity<?> createLike(@PathVariable String contentId,
 	                                    @CurrentUser UserPrincipal currentUser) {
 			service.createLike(contentId, currentUser);
-			return ResponseEntity.ok().body(new ApiResponse(true, "Like was created"));
+			return ResponseEntity.ok().body(new ApiResponse(true, "Like was created", 201));
 	}
 
 	@DeleteMapping("/{contentId}/likes")
@@ -161,7 +171,7 @@ public class ContentController {
 	public ResponseEntity<?> deleteLike(@PathVariable String contentId,
 	                                    @CurrentUser UserPrincipal currentUser) {
 		service.deleteLike(contentId, currentUser);
-		return ResponseEntity.ok().body(new ApiResponse(true, "Like was deleted"));
+		return ResponseEntity.ok().body(new ApiResponse(true, "Like was deleted", 200));
 	}
 
 	/** ---IMAGES--- **/
@@ -174,9 +184,21 @@ public class ContentController {
 		URI uri = URI.create(uriString);
 		return ResponseEntity.created(uri).body(new ApiResponse(
 				true,
-				"Image uploaded successfully"
+				"Image uploaded successfully",
+				201
 		));
 	}
 
+
+	@ExceptionHandler(MethodArgumentNotValidException.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	@ResponseBody
+	public ErrorResponse validationError(MethodArgumentNotValidException ex) {
+		BindingResult result = ex.getBindingResult();
+		final List<FieldError> fieldErrors = result.getFieldErrors();
+
+		return new ErrorResponse(new ErrorObject(403, fieldErrors.get(0).getField() + " " +
+				fieldErrors.get(0).getDefaultMessage()));
+	}
 
 }

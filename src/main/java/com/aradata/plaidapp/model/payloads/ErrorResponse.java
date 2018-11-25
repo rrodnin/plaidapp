@@ -2,17 +2,17 @@ package com.aradata.plaidapp.model.payloads;
 
 public class ErrorResponse {
 
-	private ErrorObject errorObject;
+	private ErrorObject error;
 
 	public ErrorResponse(ErrorObject errorObject) {
-		this.errorObject = errorObject;
+		this.error = errorObject;
 	}
 
 	public ErrorObject getErrorObject() {
-		return errorObject;
+		return error;
 	}
 
 	public void setErrorObject(ErrorObject errorObject) {
-		this.errorObject = errorObject;
+		this.error = errorObject;
 	}
 }

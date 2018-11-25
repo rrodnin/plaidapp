@@ -1,11 +1,8 @@
 package com.aradata.plaidapp.controller;
 
+import com.aradata.plaidapp.model.payloads.*;
 import com.aradata.plaidapp.model.user.AppUser;
 import com.aradata.plaidapp.model.user.Role;
-import com.aradata.plaidapp.model.payloads.ApiResponse;
-import com.aradata.plaidapp.model.payloads.JwtAuthenticationResponse;
-import com.aradata.plaidapp.model.payloads.LoginRequest;
-import com.aradata.plaidapp.model.payloads.SignupRequest;
 import com.aradata.plaidapp.repository.AppUserRepository;
 import com.aradata.plaidapp.security.JwtTokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -76,12 +73,12 @@ public class AuthController {
 	@PostMapping("/register")
 	public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
 		if (userRepository.existsByUsername(signUpRequest.getUsername())) {
-			return new ResponseEntity(new ApiResponse(false, "Username is already taken!"),
+			return new ResponseEntity(new ErrorResponse(new ErrorObject(400, "Username is already taken")),
 					HttpStatus.BAD_REQUEST);
 		}
 
 		if (userRepository.existsByEmail(signUpRequest.getEmail())) {
-			return new ResponseEntity(new ApiResponse(false, "Email Address already in use!"),
+			return new ResponseEntity(new ErrorResponse(new ErrorObject(400, "Email Address already in use!")),
 					HttpStatus.BAD_REQUEST);
 		}
 
@@ -100,6 +97,6 @@ public class AuthController {
 				.fromCurrentContextPath().path("/api/users/{username}")
 				.buildAndExpand(result.getUsername()).toUri();
 
-		return ResponseEntity.created(location).body(new ApiResponse(true, "User registered successfully"));
+		return ResponseEntity.created(location).body(new ApiResponse(true, "User registered successfully", 201));
 	}
 }
