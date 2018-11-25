@@ -6,7 +6,7 @@ import com.aradata.plaidapp.model.content.Content;
 import com.aradata.plaidapp.model.content.request.CommentRequest;
 import com.aradata.plaidapp.model.content.request.ContentRequest;
 import com.aradata.plaidapp.model.content.response.ContentResponse;
-import com.aradata.plaidapp.model.content.response.PagedResponse;
+import com.aradata.plaidapp.model.payloads.PagedResponse;
 import com.aradata.plaidapp.model.payloads.ApiResponse;
 import com.aradata.plaidapp.security.CurrentUser;
 import com.aradata.plaidapp.security.UserPrincipal;
@@ -15,7 +15,6 @@ import com.aradata.plaidapp.service.content.ImageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.Resource;
-import org.springframework.hateoas.Resources;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -49,12 +48,29 @@ public class ContentController {
 				.forEach(contentResponse -> {
 					contentResponse.add(
 							linkTo(methodOn(ContentController.class).getContentById(
+									currentUser,
 									contentResponse.getContentId()
 							)).withSelfRel());
+					contentResponse.add(
+							linkTo(methodOn(ContentController.class).getComments(
+									currentUser,contentResponse.getContentId(),0,30
+							)).withRel("comments"));
+					contentResponse.add(
+							linkTo(methodOn(ContentController.class).createLike(
+									contentResponse.getContentId(), currentUser
+							)).withRel("likes"));
 				});
 
 		Link link = linkTo(methodOn(ContentController.class).getContents(currentUser, page, size)).withSelfRel();
-		Resource<PagedResponse<ContentResponse>> responseResource = new Resource<>(response, link);
+		Link linkToNext = linkTo(methodOn(ContentController.class).getContents(currentUser, page, size)).withRel("next");
+		Link linkToPrev = linkTo(methodOn(ContentController.class).getContents(currentUser, page, size)).withRel("prev");
+		if (page < response.getTotalPages() - 1) {
+			linkToNext = linkTo(methodOn(ContentController.class).getContents(currentUser, page+1, size)).withRel("next");
+		}
+		if (page > 0) {
+			linkToPrev = linkTo(methodOn(ContentController.class).getContents(currentUser, page-1, size)).withRel("prev");
+		}
+		Resource<PagedResponse<ContentResponse>> responseResource = new Resource<>(response, link, linkToNext, linkToPrev);
 		return ResponseEntity.ok().body(responseResource);
 
 	}
@@ -73,8 +89,24 @@ public class ContentController {
 	}
 
 	@GetMapping("/{contentId}")
-	public ResponseEntity<ContentResponse> getContentById(@PathVariable String contentId) {
-		return ResponseEntity.ok().body(service.getContentById(contentId));
+	public ResponseEntity<ContentResponse> getContentById(@CurrentUser UserPrincipal currentUser,
+	                                                      @PathVariable String contentId) {
+		ContentResponse content = service.getContentById(contentId);
+		content.add(
+				linkTo(methodOn(ContentController.class).getContentById(
+						currentUser,content.getContentId()
+				)).withSelfRel());
+		content.add(
+				linkTo(methodOn(ContentController.class).getComments(
+						currentUser,content.getContentId(),0,30
+				)).withRel("comments"));
+		content.add(
+				linkTo(methodOn(ContentController.class).createLike(
+						content.getContentId(), currentUser
+				)).withRel("likes"));
+
+
+		return ResponseEntity.ok().body(content);
 	}
 
 	/** ---COMMENTS--- **/

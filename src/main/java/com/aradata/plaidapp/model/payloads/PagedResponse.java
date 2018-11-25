@@ -1,4 +1,4 @@
-package com.aradata.plaidapp.model.content.response;
+package com.aradata.plaidapp.model.payloads;
 
 import java.util.Iterator;
 import java.util.List;

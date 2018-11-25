@@ -9,7 +9,7 @@ import com.aradata.plaidapp.model.content.Image;
 import com.aradata.plaidapp.model.content.request.CommentRequest;
 import com.aradata.plaidapp.model.content.request.ContentRequest;
 import com.aradata.plaidapp.model.content.response.ContentResponse;
-import com.aradata.plaidapp.model.content.response.PagedResponse;
+import com.aradata.plaidapp.model.payloads.PagedResponse;
 import com.aradata.plaidapp.model.likes.Like;
 import com.aradata.plaidapp.repository.ContentRepository;
 import com.aradata.plaidapp.security.UserPrincipal;
