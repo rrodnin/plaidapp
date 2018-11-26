@@ -1,6 +1,7 @@
 package com.aradata.plaidapp.model.likes;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 
 public class Like {
 
@@ -8,6 +9,7 @@ public class Like {
 	private String id;
 
 	private String ownerId;
+
 	private String contentId;
 
 	public String getId() {

@@ -1,6 +1,7 @@
 package com.aradata.plaidapp.model;
 
 import com.aradata.plaidapp.model.content.Content;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 
 import java.util.LinkedList;
 import java.util.List;

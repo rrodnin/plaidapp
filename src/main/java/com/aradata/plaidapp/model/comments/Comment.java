@@ -1,6 +1,7 @@
 package com.aradata.plaidapp.model.comments;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 
 import java.util.Date;
 
@@ -10,7 +11,9 @@ public class Comment {
 	private String id;
 
 	private String contentId;
+
 	private String ownerId;
+
 	private String text;
 	private Date createdAt = new Date();
 

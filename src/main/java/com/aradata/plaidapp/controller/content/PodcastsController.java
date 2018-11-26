@@ -7,6 +7,7 @@ import org.springframework.core.io.InputStreamResource;
 import org.springframework.data.mongodb.gridfs.GridFsResource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -34,6 +35,7 @@ public class PodcastsController {
 
 	@PostMapping
 	@Transactional
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	public ResponseEntity<?> uploadPodcast(@RequestParam("file") MultipartFile file,
 	                                       @RequestParam("contentId") String contentId) throws IOException {
 		String uriString = service.store(file, contentId);

@@ -22,6 +22,7 @@ import org.springframework.hateoas.Link;
 import org.springframework.hateoas.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -90,6 +91,7 @@ public class ContentController {
 
 	@PostMapping
 	@Transactional
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	public ResponseEntity<?> createContent(@Valid @RequestBody ContentRequest contentRequest)  {
 		Content content = service.createContent(contentRequest);
 
@@ -195,6 +197,7 @@ public class ContentController {
 
 	@PostMapping("/{contentId}/images")
 	@Transactional
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	public ResponseEntity<?> uploadImage(@PathVariable String contentId,
 							@RequestParam("file") MultipartFile file) throws IOException {
 		String uriString = service.addImage(contentId, file);
