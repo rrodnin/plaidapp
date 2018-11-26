@@ -34,7 +34,7 @@ public class PodcastService {
 		DBObject metaData = new BasicDBObject();
 		((BasicDBObject) metaData).put("type", "podcast");
 		((BasicDBObject) metaData).put("contentId", contentId);
-		ObjectId store = operations.store(file.getInputStream(), file.getOriginalFilename(), file.getContentType());
+		ObjectId store = operations.store(file.getInputStream(), file.getOriginalFilename(), file.getContentType(), metaData);
 		return store.toHexString();
 	}
 
