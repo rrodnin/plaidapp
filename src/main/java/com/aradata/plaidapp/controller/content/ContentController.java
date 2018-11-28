@@ -1,6 +1,5 @@
 package com.aradata.plaidapp.controller.content;
 
-import com.aradata.plaidapp.model.comments.Comment;
 import com.aradata.plaidapp.model.comments.CommentResponse;
 import com.aradata.plaidapp.model.content.AppConstants;
 import com.aradata.plaidapp.model.content.Content;
@@ -8,8 +7,6 @@ import com.aradata.plaidapp.model.content.Type;
 import com.aradata.plaidapp.model.content.request.CommentRequest;
 import com.aradata.plaidapp.model.content.request.ContentRequest;
 import com.aradata.plaidapp.model.content.response.ContentResponse;
-import com.aradata.plaidapp.model.payloads.ErrorObject;
-import com.aradata.plaidapp.model.payloads.ErrorResponse;
 import com.aradata.plaidapp.model.payloads.PagedResponse;
 import com.aradata.plaidapp.model.payloads.ApiResponse;
 import com.aradata.plaidapp.security.CurrentUser;
@@ -215,11 +212,11 @@ public class ContentController {
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	@ResponseBody
-	public ErrorResponse validationError(MethodArgumentNotValidException ex) {
+	public ResponseEntity validationError(MethodArgumentNotValidException ex) {
 		BindingResult result = ex.getBindingResult();
 		final List<FieldError> fieldErrors = result.getFieldErrors();
 
-		return new ErrorResponse(new ErrorObject(403, fieldErrors.get(0).getField() + " " +
+		throw new RuntimeException((fieldErrors.get(0).getField() + " " +
 				fieldErrors.get(0).getDefaultMessage()));
 	}
 

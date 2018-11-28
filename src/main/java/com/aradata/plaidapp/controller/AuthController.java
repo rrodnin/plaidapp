@@ -1,5 +1,7 @@
 package com.aradata.plaidapp.controller;
 
+import com.aradata.plaidapp.exception.EmailAlreadyExistsException;
+import com.aradata.plaidapp.exception.UsernameAlreadyExistsException;
 import com.aradata.plaidapp.model.payloads.*;
 import com.aradata.plaidapp.model.user.AppUser;
 import com.aradata.plaidapp.model.user.Role;
@@ -19,11 +21,10 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import javax.annotation.PostConstruct;
 import javax.validation.Valid;
+import javax.xml.ws.Response;
 import java.net.URI;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 
 @RestController
@@ -74,13 +75,11 @@ public class AuthController {
 	@PostMapping("/register")
 	public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
 		if (userRepository.existsByUsername(signUpRequest.getUsername())) {
-			return new ResponseEntity(new ErrorResponse(new ErrorObject(400, "Username is already taken")),
-					HttpStatus.BAD_REQUEST);
+			throw new UsernameAlreadyExistsException();
 		}
 
 		if (userRepository.existsByEmail(signUpRequest.getEmail())) {
-			return new ResponseEntity(new ErrorResponse(new ErrorObject(400, "Email Address already in use!")),
-					HttpStatus.BAD_REQUEST);
+			throw new EmailAlreadyExistsException();
 		}
 
 		// Creating user's account
@@ -104,11 +103,11 @@ public class AuthController {
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	@ResponseBody
-	public ErrorResponse validationError(MethodArgumentNotValidException ex) {
+	public ResponseEntity validationError(MethodArgumentNotValidException ex) {
 		BindingResult result = ex.getBindingResult();
 		final List<FieldError> fieldErrors = result.getFieldErrors();
 
-		return new ErrorResponse(new ErrorObject(403, fieldErrors.get(0).getField() + " " +
+		throw new RuntimeException((fieldErrors.get(0).getField() + " " +
 				fieldErrors.get(0).getDefaultMessage()));
 	}
 }
