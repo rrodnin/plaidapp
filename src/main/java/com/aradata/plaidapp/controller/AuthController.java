@@ -108,8 +108,7 @@ public class AuthController {
 	public ResponseEntity validationError(MethodArgumentNotValidException ex) {
 		BindingResult result = ex.getBindingResult();
 		final List<FieldError> fieldErrors = result.getFieldErrors();
-
-		throw new ValidException((fieldErrors.get(0).getField() + " " +
+		return ResponseEntity.badRequest().body(new ErrorResponse(400, fieldErrors.get(0).getField() + " " +
 				fieldErrors.get(0).getDefaultMessage()));
 	}
 }

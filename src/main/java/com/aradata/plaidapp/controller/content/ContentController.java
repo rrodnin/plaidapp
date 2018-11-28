@@ -7,6 +7,7 @@ import com.aradata.plaidapp.model.content.Type;
 import com.aradata.plaidapp.model.content.request.CommentRequest;
 import com.aradata.plaidapp.model.content.request.ContentRequest;
 import com.aradata.plaidapp.model.content.response.ContentResponse;
+import com.aradata.plaidapp.model.payloads.ErrorResponse;
 import com.aradata.plaidapp.model.payloads.PagedResponse;
 import com.aradata.plaidapp.model.payloads.ApiResponse;
 import com.aradata.plaidapp.security.CurrentUser;
@@ -216,7 +217,7 @@ public class ContentController {
 		BindingResult result = ex.getBindingResult();
 		final List<FieldError> fieldErrors = result.getFieldErrors();
 
-		throw new RuntimeException((fieldErrors.get(0).getField() + " " +
+		return ResponseEntity.badRequest().body(new ErrorResponse(400, fieldErrors.get(0).getField() + " " +
 				fieldErrors.get(0).getDefaultMessage()));
 	}
 
