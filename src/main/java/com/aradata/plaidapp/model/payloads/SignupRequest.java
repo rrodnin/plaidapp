@@ -6,7 +6,6 @@ import javax.validation.constraints.Size;
 
 public class SignupRequest {
 	@NotBlank
-	@Size(min = 4, max = 40)
 	private String name;
 
 	@NotBlank
