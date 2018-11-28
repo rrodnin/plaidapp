@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
+import javax.validation.ValidationException;
 import javax.xml.ws.Response;
 import java.net.URI;
 import java.util.Collections;
@@ -107,7 +108,7 @@ public class AuthController {
 		BindingResult result = ex.getBindingResult();
 		final List<FieldError> fieldErrors = result.getFieldErrors();
 
-		throw new RuntimeException((fieldErrors.get(0).getField() + " " +
+		throw new ValidationException((fieldErrors.get(0).getField() + " " +
 				fieldErrors.get(0).getDefaultMessage()));
 	}
 }
