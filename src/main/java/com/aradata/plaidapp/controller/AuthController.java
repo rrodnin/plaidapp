@@ -2,6 +2,7 @@ package com.aradata.plaidapp.controller;
 
 import com.aradata.plaidapp.exception.EmailAlreadyExistsException;
 import com.aradata.plaidapp.exception.UsernameAlreadyExistsException;
+import com.aradata.plaidapp.exception.ValidException;
 import com.aradata.plaidapp.model.payloads.*;
 import com.aradata.plaidapp.model.user.AppUser;
 import com.aradata.plaidapp.model.user.Role;
@@ -108,7 +109,7 @@ public class AuthController {
 		BindingResult result = ex.getBindingResult();
 		final List<FieldError> fieldErrors = result.getFieldErrors();
 
-		throw new ValidationException((fieldErrors.get(0).getField() + " " +
+		throw new ValidException((fieldErrors.get(0).getField() + " " +
 				fieldErrors.get(0).getDefaultMessage()));
 	}
 }
