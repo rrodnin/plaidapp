@@ -4,6 +4,8 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 
 import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 
 public class Comment {
 
@@ -14,9 +16,36 @@ public class Comment {
 
 	private String ownerId;
 
+	private boolean isReply = false;
+
+	public boolean isReply() {
+		return isReply;
+	}
+
+	public void setReply(boolean reply) {
+		isReply = reply;
+	}
+
 	private String text;
 	private Date createdAt = new Date();
 
+	private List<Comment> replies;
+
+	public void addReply(Comment comment) {
+		if (replies == null)
+			replies = new LinkedList<>();
+		replies.add(comment);
+	}
+
+	public List<Comment> getReplies() {
+		if (replies ==null)
+			replies = new LinkedList<>();
+		return replies;
+	}
+
+	public void setReplies(List<Comment> replies) {
+		this.replies = replies;
+	}
 
 	public String getContentId() {
 		return contentId;

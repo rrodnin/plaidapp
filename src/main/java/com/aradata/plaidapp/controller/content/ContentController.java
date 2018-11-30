@@ -1,5 +1,6 @@
 package com.aradata.plaidapp.controller.content;
 
+import com.aradata.plaidapp.model.comments.Comment;
 import com.aradata.plaidapp.model.comments.CommentResponse;
 import com.aradata.plaidapp.model.content.AppConstants;
 import com.aradata.plaidapp.model.content.Content;
@@ -170,6 +171,22 @@ public class ContentController {
 		ApiResponse<CommentResponse> apiResponse = new ApiResponse<>(true, "Comment created successfully", 201);
 		apiResponse.setData(comment);
 
+		return ResponseEntity.created(location)
+				.body(apiResponse);
+	}
+
+	@PostMapping("/{contentId}/comments/{commentId}")
+	public ResponseEntity<?> replyToComment(@PathVariable String contentId, @PathVariable String commentId,
+	                                        @CurrentUser UserPrincipal currentUser,
+	                                        @Valid @RequestBody CommentRequest request) {
+		CommentResponse comment = service.replyToComment(currentUser, request, contentId, commentId);
+
+		URI location = ServletUriComponentsBuilder
+				.fromCurrentContextPath().path("/api/comments/{commentId}")
+				.buildAndExpand(comment.getCommentId()).toUri();
+
+		ApiResponse<CommentResponse> apiResponse = new ApiResponse<>(true, "Comment created successfully", 201);
+		apiResponse.setData(comment);
 		return ResponseEntity.created(location)
 				.body(apiResponse);
 	}

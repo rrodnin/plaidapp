@@ -132,6 +132,11 @@ public class ContentService {
 		return createCommentResponseFromComent(currentUser,commentService.createComment(currentUser, request, contentId));
 	}
 
+	public CommentResponse replyToComment(UserPrincipal currentUser, CommentRequest request, String contentId, String commentId) {
+		validateContentId(contentId);
+		return createCommentResponseFromComent(currentUser, commentService.reply(currentUser, request, contentId, commentId));
+	}
+
 	private CommentResponse createCommentResponseFromComent(UserPrincipal currentUser, Comment comment) {
 		CommentResponse response = CommentResponse.createFromComment(comment);
 		response.setOwnerName(usersService.findById(currentUser.getId()).getName());

@@ -3,6 +3,7 @@ package com.aradata.plaidapp.model.comments;
 import org.springframework.hateoas.ResourceSupport;
 
 import java.util.Date;
+import java.util.List;
 
 public class CommentResponse extends ResourceSupport {
 
@@ -11,6 +12,26 @@ public class CommentResponse extends ResourceSupport {
 	private String ownerId;
 	private String text;
 	private Date createdAt;
+
+	public boolean isReply() {
+		return isReply;
+	}
+
+	public void setReply(boolean reply) {
+		isReply = reply;
+	}
+
+	public List<Comment> getReplies() {
+		return replies;
+	}
+
+	public void setReplies(List<Comment> replies) {
+		this.replies = replies;
+	}
+
+	private boolean isReply;
+
+	private List<Comment> replies;
 
 	private String ownerName;
 
@@ -29,8 +50,12 @@ public class CommentResponse extends ResourceSupport {
 		response.setCreatedAt(comment.getCreatedAt());
 		response.setOwnerId(comment.getOwnerId());
 		response.setText(comment.getText());
+		response.replies = comment.getReplies();
+		response.isReply = comment.isReply();
 		return response;
 	}
+
+
 
 	public String getCommentId() {
 		return commentId;
