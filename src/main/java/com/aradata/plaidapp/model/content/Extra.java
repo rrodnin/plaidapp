@@ -5,6 +5,7 @@ public class Extra {
 	private int podcastListening;
 	private int youtubeViews;
 	private int youtubeLikes;
+	private int youtubeDislikes;
 	private String podcastUrl;
 
 	private int views;
