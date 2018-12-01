@@ -13,6 +13,12 @@ public class CommentResponse extends ResourceSupport {
 	private String text;
 	private Date createdAt;
 
+	private boolean isReply;
+
+	private List<Comment> replies;
+
+	private String ownerName;
+
 	public boolean isReply() {
 		return isReply;
 	}
@@ -29,11 +35,7 @@ public class CommentResponse extends ResourceSupport {
 		this.replies = replies;
 	}
 
-	private boolean isReply;
 
-	private List<Comment> replies;
-
-	private String ownerName;
 
 	public String getOwnerName() {
 		return ownerName;
@@ -52,6 +54,7 @@ public class CommentResponse extends ResourceSupport {
 		response.setText(comment.getText());
 		response.replies = comment.getReplies();
 		response.isReply = comment.isReply();
+		response.ownerName = comment.getOwnerName();
 		return response;
 	}
 

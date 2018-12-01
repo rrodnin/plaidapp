@@ -18,6 +18,16 @@ public class Comment {
 
 	private boolean isReply = false;
 
+	public String getOwnerName() {
+		return ownerName;
+	}
+
+	public void setOwnerName(String ownerName) {
+		this.ownerName = ownerName;
+	}
+
+	private String ownerName;
+
 	public boolean isReply() {
 		return isReply;
 	}
