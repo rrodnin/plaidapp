@@ -9,6 +9,21 @@ public class Extra {
 
 	private int views;
 
+	public String getPodcastUrl() {
+		return podcastUrl;
+	}
+
+	public void setPodcastUrl(String podcastUrl) {
+		this.podcastUrl = podcastUrl;
+	}
+
+	public int getViews() {
+		return views;
+	}
+
+	public void setViews(int views) {
+		this.views = views;
+	}
 
 	public int getPodcastListening() {
 		return podcastListening;
