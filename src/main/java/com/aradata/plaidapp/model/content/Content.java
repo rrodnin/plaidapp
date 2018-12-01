@@ -32,9 +32,19 @@ public class Content {
 	@NotBlank
 	protected String text;
 
+	protected Extra extra = new Extra();
+
 	protected int likes = 0;
 
 	protected LinkedList<Image> images;
+
+	public Extra getExtra() {
+		return extra;
+	}
+
+	public void setExtra(Extra extra) {
+		this.extra = extra;
+	}
 
 	public LinkedList<Image> getImages() {
 		if (images == null)

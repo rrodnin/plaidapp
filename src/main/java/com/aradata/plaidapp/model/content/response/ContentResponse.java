@@ -1,6 +1,7 @@
 package com.aradata.plaidapp.model.content.response;
 
 import com.aradata.plaidapp.model.content.Content;
+import com.aradata.plaidapp.model.content.Extra;
 import com.aradata.plaidapp.model.content.Image;
 import com.aradata.plaidapp.model.content.Type;
 import org.springframework.data.annotation.Id;
@@ -21,6 +22,7 @@ public class ContentResponse extends ResourceSupport {
 	protected String text;
 	protected int likes = 0;
 	protected LinkedList<Image> images;
+	protected Extra extra;
 
 	protected boolean userLikes;
 
@@ -34,7 +36,17 @@ public class ContentResponse extends ResourceSupport {
 		response.text = content.getText();
 		response.likes = content.getLikes();
 		response.images = content.getImages();
+		response.extra = content.getExtra();
 		return response;
+	}
+
+
+	public Extra getExtra() {
+		return extra;
+	}
+
+	public void setExtra(Extra extra) {
+		this.extra = extra;
 	}
 
 	public boolean isUserLikes() {
