@@ -108,7 +108,7 @@ public class ContentService {
 		return fromContent;
 	}
 
-	public PagedResponse<CommentResponse> fetchComments(UserPrincipal currentUser, String contentId, int page, int size) {
+	public PagedResponse<Comment> fetchComments(UserPrincipal currentUser, String contentId, int page, int size) {
 		validatePageNumberAndSize(page, size);
 		validateContentId(contentId);
 		Pageable pageable = PageRequest.of(page, size, Sort.Direction.DESC, "createdAt");
@@ -120,21 +120,21 @@ public class ContentService {
 					comments.getSize(), comments.getTotalElements(), comments.getTotalPages());
 		}
 
-		List<CommentResponse> responseList = comments.map(comment -> createCommentResponseFromComent(currentUser, comment)).getContent();
+		List<Comment> responseList = comments.getContent();
 
 		return new PagedResponse<>(responseList, comments.getNumber(), comments.getSize(),
 				comments.getTotalElements(), comments.getTotalPages());
 
 	}
 
-	public CommentResponse createComment(UserPrincipal currentUser, CommentRequest request, String contentId) {
+	public Comment createComment(UserPrincipal currentUser, CommentRequest request, String contentId) {
 		validateContentId(contentId);
-		return createCommentResponseFromComent(currentUser,commentService.createComment(currentUser, request, contentId));
+		return commentService.createComment(currentUser, request, contentId);
 	}
 
-	public CommentResponse replyToComment(UserPrincipal currentUser, CommentRequest request, String contentId, String commentId) {
+	public Comment replyToComment(UserPrincipal currentUser, CommentRequest request, String contentId, String commentId) {
 		validateContentId(contentId);
-		return createCommentResponseFromComent(currentUser, commentService.reply(currentUser, request, contentId, commentId));
+		return commentService.reply(currentUser, request, contentId, commentId);
 	}
 
 	private CommentResponse createCommentResponseFromComent(UserPrincipal currentUser, Comment comment) {

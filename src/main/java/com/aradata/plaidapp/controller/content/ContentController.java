@@ -142,7 +142,7 @@ public class ContentController {
 	                                          @PathVariable String contentId,
 	                                          @RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
 	                                          @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size) {
-		PagedResponse<CommentResponse> pagedResponse = service.fetchComments(currentUser,contentId,
+		PagedResponse<Comment> pagedResponse = service.fetchComments(currentUser,contentId,
 																			page, size);
 		Link link = linkTo(methodOn(ContentController.class).getComments(currentUser, contentId, page, size)).withSelfRel();
 		Link linkToNext = linkTo(methodOn(ContentController.class).getComments(currentUser, contentId, page, size)).withRel("next");
@@ -153,7 +153,7 @@ public class ContentController {
 		if (page > 0) {
 			linkToPrev = linkTo(methodOn(ContentController.class).getContents(currentUser, page-1, size)).withRel("prev");
 		}
-		Resource<PagedResponse<CommentResponse>> responseResource = new Resource<>(pagedResponse, link, linkToNext, linkToPrev);
+		Resource<PagedResponse<Comment>> responseResource = new Resource<>(pagedResponse, link, linkToNext, linkToPrev);
 		return ResponseEntity.ok().body(responseResource);
 	}
 
@@ -162,13 +162,13 @@ public class ContentController {
 	public ResponseEntity<?> createComment(@PathVariable String contentId,
 											@CurrentUser UserPrincipal currentUser,
 	                                       @Valid @RequestBody CommentRequest request) {
-		CommentResponse comment = service.createComment(currentUser, request, contentId);
+		Comment comment = service.createComment(currentUser, request, contentId);
 
 		URI location = ServletUriComponentsBuilder
 				.fromCurrentContextPath().path("/api/comments/{commentId}")
-				.buildAndExpand(comment.getCommentId()).toUri();
+				.buildAndExpand(comment.getId()).toUri();
 
-		ApiResponse<CommentResponse> apiResponse = new ApiResponse<>(true, "Comment created successfully", 201);
+		ApiResponse<Comment> apiResponse = new ApiResponse<>(true, "Comment created successfully", 201);
 		apiResponse.setData(comment);
 
 		return ResponseEntity.created(location)
@@ -179,13 +179,13 @@ public class ContentController {
 	public ResponseEntity<?> replyToComment(@PathVariable String contentId, @PathVariable String commentId,
 	                                        @CurrentUser UserPrincipal currentUser,
 	                                        @Valid @RequestBody CommentRequest request) {
-		CommentResponse comment = service.replyToComment(currentUser, request, contentId, commentId);
+		Comment comment = service.replyToComment(currentUser, request, contentId, commentId);
 
 		URI location = ServletUriComponentsBuilder
 				.fromCurrentContextPath().path("/api/comments/{commentId}")
-				.buildAndExpand(comment.getCommentId()).toUri();
+				.buildAndExpand(comment.getId()).toUri();
 
-		ApiResponse<CommentResponse> apiResponse = new ApiResponse<>(true, "Comment created successfully", 201);
+		ApiResponse<Comment> apiResponse = new ApiResponse<>(true, "Comment created successfully", 201);
 		apiResponse.setData(comment);
 		return ResponseEntity.created(location)
 				.body(apiResponse);
