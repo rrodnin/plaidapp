@@ -18,10 +18,8 @@ import com.aradata.plaidapp.service.UsersService;
 import com.aradata.plaidapp.service.comment.CommentService;
 import com.aradata.plaidapp.service.likes.LikeService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -49,7 +47,6 @@ public class ContentService {
 
 	@Autowired
 	private UsersService usersService;
-
 
 	public PagedResponse<ContentResponse> fetchAllContent(UserPrincipal currentUser, int page, int size) {
 		validatePageNumberAndSize(page, size);
@@ -182,7 +179,7 @@ public class ContentService {
 
 	public PagedResponse<ContentResponse> findAllById(LinkedList<String> ids, int page, int size, UserPrincipal currentUser) {
 		Pageable pageable = PageRequest.of(page, size, Sort.Direction.DESC, "createdAt");
-		Page<Content> contents = repository.findAllById(ids, pageable);
+		Page<Content> contents = repository.findAllByIdIsIn(ids, pageable);
 
 		if(contents.getNumberOfElements() == 0) {
 			return new PagedResponse<>(Collections.emptyList(), contents.getNumber(),
@@ -191,6 +188,45 @@ public class ContentService {
 
 		List<ContentResponse> responseList = contents.map(content ->
 				createContentResponseFromContent(currentUser.getId(),content)).getContent();
+
+		return new PagedResponse<>(responseList, contents.getNumber(), contents.getSize(),
+				contents.getTotalElements(), contents.getTotalPages());
+	}
+
+	public Content saveContent(Content content) {
+		return repository.save(content);
+	}
+
+	public void addView(String contentId) {
+		Content content = validateContentId(contentId);
+		content.getExtra().setViews(content.getExtra().getViews() + 1);
+		repository.save(content);
+	}
+
+	public void listen(String contentId) {
+		Content content = validateContentId(contentId);
+		content.getExtra().setPodcastListening(content.getExtra().getPodcastListening() + 1);
+		repository.save(content);
+	}
+
+	public boolean existsByGuid(String guid) {
+		return repository.existsByGuid(guid);
+	}
+
+	public PagedResponse<ContentResponse> searchByType(UserPrincipal currentUser, int page, int size, Type type) {
+		validatePageNumberAndSize(page, size);
+
+		Pageable pageable = PageRequest.of(page, size, Sort.Direction.DESC, "createdAt");
+		Page<Content> contents = repository.findAllByType(type, pageable);
+
+		if(contents.getNumberOfElements() == 0) {
+			return new PagedResponse<>(Collections.emptyList(), contents.getNumber(),
+					contents.getSize(), contents.getTotalElements(), contents.getTotalPages());
+		}
+
+		List<ContentResponse> responseList = contents.map(content ->
+				createContentResponseFromContent(currentUser.getId(),content)).getContent();
+
 
 		return new PagedResponse<>(responseList, contents.getNumber(), contents.getSize(),
 				contents.getTotalElements(), contents.getTotalPages());

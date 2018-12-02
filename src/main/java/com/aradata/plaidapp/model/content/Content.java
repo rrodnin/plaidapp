@@ -34,6 +34,16 @@ public class Content {
 
 	protected Extra extra = new Extra();
 
+	protected String guid;
+
+	public String getGuid() {
+		return guid;
+	}
+
+	public void setGuid(String guid) {
+		this.guid = guid;
+	}
+
 	protected int likes = 0;
 
 	protected LinkedList<Image> images;

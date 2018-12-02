@@ -1,7 +1,11 @@
 package com.aradata.plaidapp.controller.content;
 
+import com.aradata.plaidapp.model.content.request.PodcastUrl;
 import com.aradata.plaidapp.model.payloads.ApiResponse;
 import com.aradata.plaidapp.service.content.PodcastService;
+import com.icosillion.podengine.exceptions.DateFormatException;
+import com.icosillion.podengine.exceptions.InvalidFeedException;
+import com.icosillion.podengine.exceptions.MalformedFeedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.data.mongodb.gridfs.GridFsResource;
@@ -13,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import javax.validation.Valid;
 import java.io.IOException;
 import java.net.URI;
 
@@ -23,28 +28,23 @@ public class PodcastsController {
 	@Autowired
 	private PodcastService service;
 
-	@GetMapping("/{podcastId}")
-	@ResponseBody
-	public ResponseEntity<InputStreamResource> getPodcast(@PathVariable String podcastId) throws IOException {
-		GridFsResource podcast = service.getPodcastById(podcastId);
-		return ResponseEntity.ok()
-				.contentLength(podcast.contentLength())
-				.contentType(MediaType.parseMediaType(podcast.getContentType()))
-				.body(new InputStreamResource(podcast.getInputStream()));
-	}
+//	@GetMapping("/{podcastId}")
+//	@ResponseBody
+//	public ResponseEntity<InputStreamResource> getPodcast(@PathVariable String podcastId) throws IOException {
+//		GridFsResource podcast = service.getPodcastById(podcastId);
+//		return ResponseEntity.ok()
+//				.contentLength(podcast.contentLength())
+//				.contentType(MediaType.parseMediaType(podcast.getContentType()))
+//				.body(new InputStreamResource(podcast.getInputStream()));
+//	}
 
 	@PostMapping
 	@Transactional
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
-	public ResponseEntity<?> uploadPodcast(@RequestParam("file") MultipartFile file,
-	                                       @RequestParam("contentId") String contentId) throws IOException {
-		String uriString = service.store(file, contentId);
-		URI uri = ServletUriComponentsBuilder.fromCurrentContextPath()
-				.path("/api/podcasts/{podcastId}").buildAndExpand(uriString).toUri();
-		return ResponseEntity.created(uri).body(new ApiResponse(
-				true,
-				"Podcast uploaded successfully",
-				201
-		));
+	public ResponseEntity<?> uploadPodcast(@RequestBody @Valid  PodcastUrl podcastUrl) throws IOException, InvalidFeedException, MalformedFeedException, DateFormatException {
+
+		service.uploadFeed(podcastUrl);
+
+		return  ResponseEntity.ok().body(null);
 	}
 }

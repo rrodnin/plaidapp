@@ -52,4 +52,9 @@ public class TopicService {
 	public List<Topic> fetchAll() {
 		return repository.findAll();
 	}
+
+	public void validateTopicId(String topicId) {
+		repository.findById(topicId).orElseThrow(() -> new ResourceNotFoundException("topic", "id", topicId));
+
+	}
 }

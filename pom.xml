@@ -23,6 +23,16 @@
 		<java.version>1.8</java.version>
 	</properties>
 
+    <repositories>
+        <repository>
+            <id>icosillion</id>
+            <name>Icosillion Repository</name>
+            <url>https://maven.icosillion.com/artifactory/open-source/</url>
+        </repository>
+    </repositories>
+
+
+
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -49,6 +59,13 @@
 			<artifactId>jjwt</artifactId>
 			<version>0.9.0</version>
 		</dependency>
+
+
+        <dependency>
+            <groupId>com.icosillion.podengine</groupId>
+            <artifactId>podengine</artifactId>
+            <version>2.2</version>
+        </dependency>
 
 		<!--SWAGGER-->
 		<dependency>

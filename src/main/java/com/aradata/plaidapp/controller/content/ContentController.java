@@ -17,6 +17,7 @@ import com.aradata.plaidapp.service.content.ContentService;
 import com.aradata.plaidapp.service.content.ImageService;
 import com.aradata.plaidapp.service.content.PodcastService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Required;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.Resource;
 import org.springframework.http.HttpStatus;
@@ -88,6 +89,27 @@ public class ContentController {
 
 	}
 
+
+	@GetMapping("/search")
+	public ResponseEntity<?> searchContent(@CurrentUser UserPrincipal currentUser,
+	                          @RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
+	                          @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size,
+	                          @RequestParam(value = "type") Type type) {
+		PagedResponse<ContentResponse> response = service.searchByType(currentUser, page, size, type);
+
+		Link link = linkTo(methodOn(ContentController.class).searchContent(currentUser, page, size, type)).withSelfRel();
+		Link linkToNext = linkTo(methodOn(ContentController.class).searchContent(currentUser, page, size, type)).withRel("next");
+		Link linkToPrev = linkTo(methodOn(ContentController.class).searchContent(currentUser, page, size, type)).withRel("prev");
+		if (page < response.getTotalPages() - 1) {
+			linkToNext = linkTo(methodOn(ContentController.class).searchContent(currentUser, page+1, size, type)).withRel("next");
+		}
+		if (page > 0) {
+			linkToPrev = linkTo(methodOn(ContentController.class).searchContent(currentUser, page-1, size, type)).withRel("prev");
+		}
+		Resource<PagedResponse<ContentResponse>> responseResource = new Resource<>(response, link, linkToNext, linkToPrev);
+		return ResponseEntity.ok().body(responseResource);
+	}
+
 	@PostMapping
 	@Transactional
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
@@ -118,19 +140,6 @@ public class ContentController {
 				linkTo(methodOn(ContentController.class).createLike(
 						content.getContentId(), currentUser
 				)).withRel("likes"));
-
-		if (content.getType() == Type.PODCAST) {
-			try {
-				String podcastIdByContentId = podcastService.getPodcastIdByContentId(content.getContentId());
-				if (!podcastIdByContentId.isEmpty()) {
-					content.add(linkTo(methodOn(PodcastsController.class)
-							.getPodcast(podcastIdByContentId)).withRel("podcast"));
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-
 
 		return ResponseEntity.ok().body(content);
 	}
@@ -224,6 +233,20 @@ public class ContentController {
 				"Image uploaded successfully",
 				201
 		));
+	}
+
+	@PostMapping("/{contentId}/views")
+	public ResponseEntity<?> viewContent(@PathVariable String contentId) {
+		service.addView(contentId);
+
+		return  ResponseEntity.ok().body(null);
+	}
+
+	@PostMapping("/{contentId}/listenings")
+	public ResponseEntity<?> listenContent(@PathVariable String contentId) {
+		service.listen(contentId);
+
+		return ResponseEntity.ok().body(null);
 	}
 
 

@@ -10,6 +10,17 @@ public class Extra {
 
 	private int views;
 
+
+
+	public int getYoutubeDislikes() {
+		return youtubeDislikes;
+	}
+
+	public void setYoutubeDislikes(int youtubeDislikes) {
+		this.youtubeDislikes = youtubeDislikes;
+	}
+
+
 	public String getPodcastUrl() {
 		return podcastUrl;
 	}
