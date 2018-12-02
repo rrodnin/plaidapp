@@ -231,4 +231,8 @@ public class ContentService {
 		return new PagedResponse<>(responseList, contents.getNumber(), contents.getSize(),
 				contents.getTotalElements(), contents.getTotalPages());
 	}
+
+	public Content findById(String contentId) {
+		return validateContentId(contentId);
+	}
 }

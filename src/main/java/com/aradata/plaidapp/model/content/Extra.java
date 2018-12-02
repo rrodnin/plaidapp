@@ -1,32 +1,35 @@
 package com.aradata.plaidapp.model.content;
 
+import java.math.BigInteger;
+
 public class Extra {
 
 	private int podcastListening;
-	private int youtubeViews;
-	private int youtubeLikes;
-	private int youtubeDislikes;
-	private String podcastUrl;
+	private BigInteger youtubeViews;
+	private BigInteger youtubeLikes;
+	private BigInteger youtubeDislikes;
 
 	private int views;
 
 
+	public BigInteger getYoutubeViews() {
+		return youtubeViews;
+	}
 
-	public int getYoutubeDislikes() {
+	public void setYoutubeViews(BigInteger youtubeViews) {
+		this.youtubeViews = youtubeViews;
+	}
+
+	public BigInteger getYoutubeLikes() {
+		return youtubeLikes;
+	}
+
+	public BigInteger getYoutubeDislikes() {
 		return youtubeDislikes;
 	}
 
-	public void setYoutubeDislikes(int youtubeDislikes) {
+	public void setYoutubeDislikes(BigInteger youtubeDislikes) {
 		this.youtubeDislikes = youtubeDislikes;
-	}
-
-
-	public String getPodcastUrl() {
-		return podcastUrl;
-	}
-
-	public void setPodcastUrl(String podcastUrl) {
-		this.podcastUrl = podcastUrl;
 	}
 
 	public int getViews() {
@@ -45,19 +48,9 @@ public class Extra {
 		this.podcastListening = podcastListening;
 	}
 
-	public int getYoutubeViews() {
-		return youtubeViews;
-	}
 
-	public void setYoutubeViews(int youtubeViews) {
-		this.youtubeViews = youtubeViews;
-	}
 
-	public int getYoutubeLikes() {
-		return youtubeLikes;
-	}
-
-	public void setYoutubeLikes(int youtubeLikes) {
+	public void setYoutubeLikes(BigInteger youtubeLikes) {
 		this.youtubeLikes = youtubeLikes;
 	}
 }

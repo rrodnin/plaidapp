@@ -67,6 +67,12 @@
             <version>2.2</version>
         </dependency>
 
+		<!-- YouTube Data V3 support -->
+		<dependency>
+		<groupId>com.google.apis</groupId>
+		<artifactId>google-api-services-youtube</artifactId>
+		<version>v3-rev206-1.25.0</version>
+		</dependency>
 		<!--SWAGGER-->
 		<dependency>
 			<groupId>io.springfox</groupId>

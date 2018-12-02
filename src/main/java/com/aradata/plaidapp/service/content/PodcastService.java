@@ -60,7 +60,6 @@ public class PodcastService {
 			for (String topicId : podcastUrl.getTopicId()) {
 				topicService.validateTopicId(topicId);
 			}
-
 		}
 		PodcastFeed feed = new PodcastFeed();
 		feed.setUrl(podcastUrl.getUrl());
