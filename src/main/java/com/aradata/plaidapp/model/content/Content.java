@@ -7,6 +7,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.LinkedList;
+import java.util.Set;
 
 public class Content {
 
@@ -42,6 +43,16 @@ public class Content {
 
 	public void setGuid(String guid) {
 		this.guid = guid;
+	}
+
+	private Set<String> categories;
+
+	public Set<String> getCategories() {
+		return categories;
+	}
+
+	public void setCategories(Set<String> categories) {
+		this.categories = categories;
 	}
 
 	protected int likes = 0;

@@ -10,6 +10,7 @@ import org.springframework.hateoas.ResourceSupport;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.LinkedList;
+import java.util.Set;
 
 public class ContentResponse extends ResourceSupport {
 
@@ -24,6 +25,16 @@ public class ContentResponse extends ResourceSupport {
 	protected LinkedList<Image> images;
 	protected Extra extra;
 
+	public Set<String> getCategories() {
+		return categories;
+	}
+
+	public void setCategories(Set<String> categories) {
+		this.categories = categories;
+	}
+
+	protected Set<String> categories;
+
 	protected boolean userLikes;
 
 	public static ContentResponse createFromContent(Content content) {
@@ -37,6 +48,7 @@ public class ContentResponse extends ResourceSupport {
 		response.likes = content.getLikes();
 		response.images = content.getImages();
 		response.extra = content.getExtra();
+		response.categories = content.getCategories();
 		return response;
 	}
 

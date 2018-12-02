@@ -36,6 +36,7 @@ import javax.validation.Valid;
 import java.io.IOException;
 import java.net.URI;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/contents")
@@ -90,7 +91,7 @@ public class ContentController {
 	}
 
 
-	@GetMapping("/search")
+	@GetMapping("/type")
 	public ResponseEntity<?> searchContent(@CurrentUser UserPrincipal currentUser,
 	                          @RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
 	                          @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size,
@@ -108,6 +109,17 @@ public class ContentController {
 		}
 		Resource<PagedResponse<ContentResponse>> responseResource = new Resource<>(response, link, linkToNext, linkToPrev);
 		return ResponseEntity.ok().body(responseResource);
+	}
+
+	@GetMapping("/tags")
+	public ResponseEntity<?> findByTags(@CurrentUser UserPrincipal currentUser,
+	                                    @RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
+	                                    @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size,
+	                                    @RequestParam(value = "tags") Set<String> tags) {
+
+		PagedResponse<ContentResponse> byTags = service.findByTags(tags, page, size, currentUser);
+
+		return ResponseEntity.ok(byTags);
 	}
 
 	@PostMapping

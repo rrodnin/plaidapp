@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class ContentService {
@@ -180,6 +181,22 @@ public class ContentService {
 	public PagedResponse<ContentResponse> findAllById(LinkedList<String> ids, int page, int size, UserPrincipal currentUser) {
 		Pageable pageable = PageRequest.of(page, size, Sort.Direction.DESC, "createdAt");
 		Page<Content> contents = repository.findAllByIdIsIn(ids, pageable);
+
+		if(contents.getNumberOfElements() == 0) {
+			return new PagedResponse<>(Collections.emptyList(), contents.getNumber(),
+					contents.getSize(), contents.getTotalElements(), contents.getTotalPages());
+		}
+
+		List<ContentResponse> responseList = contents.map(content ->
+				createContentResponseFromContent(currentUser.getId(),content)).getContent();
+
+		return new PagedResponse<>(responseList, contents.getNumber(), contents.getSize(),
+				contents.getTotalElements(), contents.getTotalPages());
+	}
+
+	public PagedResponse<ContentResponse> findByTags(Set<String> tags, int page, int size, UserPrincipal currentUser) {
+		Pageable pageable = PageRequest.of(page, size, Sort.Direction.DESC, "createdAt");
+		Page<Content> contents = repository.findAllByCategoriesContaining(tags, pageable);
 
 		if(contents.getNumberOfElements() == 0) {
 			return new PagedResponse<>(Collections.emptyList(), contents.getNumber(),

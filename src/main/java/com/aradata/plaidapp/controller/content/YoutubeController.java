@@ -1,6 +1,7 @@
 package com.aradata.plaidapp.controller.content;
 
 import com.aradata.plaidapp.model.content.Content;
+import com.aradata.plaidapp.model.content.request.QueryRequest;
 import com.aradata.plaidapp.model.content.request.SaveContentByVideoIdRequest;
 import com.aradata.plaidapp.model.content.request.SavePlaylistRequest;
 import com.aradata.plaidapp.service.YoutubeService;
@@ -43,5 +44,17 @@ public class YoutubeController {
 	public ResponseEntity<?> addPlaylist(@RequestBody @Valid SavePlaylistRequest request) throws IOException {
 
 		return ResponseEntity.ok(service.savePlaylist(request));
+	}
+
+	@PostMapping("/queries")
+	public ResponseEntity<?> addQuery(@RequestBody QueryRequest query) {
+
+		return ResponseEntity.ok(service.addQuery(query));
+	}
+
+	@PostMapping("/updateQueries")
+	public ResponseEntity<?> updateQueries() throws IOException {
+		service.updateQueries();
+		return ResponseEntity.ok().body(null);
 	}
 }

@@ -68,8 +68,10 @@ public class PodcastService {
 		repository.save(feed);
 
 		for (Episode episode: podcast.getEpisodes()) {
+
 			Content content = new Content();
 			content.setType(Type.PODCAST);
+			content.setCategories(episode.getCategories());
 			content.setGuid(episode.getGUID());
 			content.setTitle(episode.getTitle());
 			content.setDescription(episode.getAuthor());
@@ -95,6 +97,7 @@ public class PodcastService {
 					topicService.addContentToTopic(topicId, saved.getId());
 				}
 			}
+
 		}
 
 
@@ -121,6 +124,7 @@ public class PodcastService {
 					content.setGuid(episode.getGUID());
 					content.setTitle(episode.getTitle());
 					content.setDescription(episode.getAuthor());
+					content.setCategories(episode.getCategories());
 					content.setText(episode.getDescription());
 					content.setUrl(episode.getEnclosure().getURL().toString());
 					content.setCreatedAt(episode.getPubDate());
