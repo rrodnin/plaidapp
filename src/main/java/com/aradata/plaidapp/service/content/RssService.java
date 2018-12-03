@@ -9,6 +9,10 @@ import com.icosillion.podengine.exceptions.InvalidFeedException;
 import com.icosillion.podengine.exceptions.MalformedFeedException;
 import com.icosillion.podengine.models.Episode;
 import com.icosillion.podengine.models.Podcast;
+import com.sun.syndication.feed.synd.*;
+import com.sun.syndication.io.FeedException;
+import com.sun.syndication.io.SyndFeedInput;
+import com.sun.syndication.io.XmlReader;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
@@ -20,6 +24,8 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class RssService {
@@ -33,14 +39,15 @@ public class RssService {
 	@Autowired
 	TopicService topicService;
 
-	public RssFeed createRss(PodcastUrl podcastUrl) throws InvalidFeedException, MalformedFeedException, IOException {
+	public RssFeed createRss(PodcastUrl podcastUrl) throws IOException, FeedException {
 		if(repository.existsByUrl(podcastUrl.getUrl())) {
 			throw new PodcastAlreadyExistsException();
 		}
 
 		URL url = new URL(podcastUrl.getUrl());
 
-		Podcast podcast = new Podcast(url);
+		SyndFeedInput input = new SyndFeedInput();
+		SyndFeed rssfeed = input.build(new XmlReader(url));
 
 		if (!(podcastUrl.getTopicId().length == 0)) {
 			for (String topicId : podcastUrl.getTopicId()) {
@@ -53,20 +60,35 @@ public class RssService {
 
 		repository.save(feed);
 
-		for (Episode episode : podcast.getEpisodes()) {
+		for (SyndEntry entry : (List<SyndEntry>) rssfeed.getEntries()) {
 			try {
 				Content content = new Content();
 				content.setType(Type.WEBPAGE);
-				content.setGuid(episode.getGUID());
-				content.setTitle(episode.getTitle());
-				content.setDescription(podcast.getTitle());
-				content.setCategories(episode.getCategories());
-				content.setText(episode.getDescription());
-				content.setUrl(episode.getGUID());
-				content.setCreatedAt(episode.getPubDate());
+				content.setGuid(entry.getUri());
+				content.setTitle(entry.getTitle());
+				content.setDescription(rssfeed.getTitle());
+
+				List<SyndCategoryImpl> categories = (List<SyndCategoryImpl>) entry.getCategories();
+				Set<String> collect = categories.stream().map(syndCategory -> syndCategory.getName()).collect(Collectors.toSet());
+				content.setCategories(collect);
+				List<SyndContentImpl> textList = (List<SyndContentImpl>) entry.getContents();
+				SyndContentImpl text;
+				SyndContentImpl descr = (SyndContentImpl) entry.getDescription();
+				if (textList.size() != 0) {
+					text= textList.get(0);
+				} else if(descr != null) {
+					text = descr;
+				} else {
+					text = new SyndContentImpl();
+					text.setValue("");
+				}
+				content.setText(text.getValue());
+				content.setUrl(entry.getLink());
+				content.setCreatedAt(entry.getPublishedDate());
+
 
 				Image image = new Image();
-				Document doc = Jsoup.connect(episode.getGUID()).get();
+				Document doc = Jsoup.connect(entry.getLink()).get();
 				String imageUrl = null;
 				Elements metaOgImage = doc.select("meta[property=og:image]");
 				if (metaOgImage!=null) {
@@ -82,7 +104,7 @@ public class RssService {
 						topicService.addContentToTopic(topicId, saved.getId());
 					}
 				}
-			} catch (MalformedFeedException | DateFormatException | MalformedURLException e) {
+			} catch (IOException e) {
 				continue;
 			}
 
@@ -95,28 +117,51 @@ public class RssService {
 		List<RssFeed> all = repository.findAll();
 
 		for (RssFeed feed : all) {
-			Podcast podcast;
+			URL url = null;
 			try {
-				podcast = new Podcast(feed.getUrl());
-			} catch (MalformedFeedException e) {
+				url = new URL(feed.getUrl());
+			} catch (MalformedURLException e) {
 				continue;
 			}
-			for (Episode episode : podcast.getEpisodes()) {
+			Podcast podcast;
+			SyndFeedInput input = new SyndFeedInput();
+			SyndFeed rssfeed = null;
+			try {
+				rssfeed = input.build(new XmlReader(url));
+			} catch (FeedException | IOException e) {
+				continue;
+			}
+			for (SyndEntry entry : (List<SyndEntry>) rssfeed.getEntries()) {
 				try {
-					if (service.existsByGuid(episode.getGUID()))
+					if (service.existsByGuid(entry.getUri()))
 						break;
 					Content content = new Content();
 					content.setType(Type.WEBPAGE);
-					content.setGuid(episode.getGUID());
-					content.setTitle(episode.getTitle());
-					content.setDescription(podcast.getTitle());
-					content.setCategories(episode.getCategories());
-					content.setText(episode.getDescription());
-					content.setUrl(episode.getGUID());
-					content.setCreatedAt(episode.getPubDate());
+					content.setGuid(entry.getUri());
+					content.setTitle(entry.getTitle());
+					content.setDescription(rssfeed.getTitle());
+
+					List<SyndCategoryImpl> categories = (List<SyndCategoryImpl>) entry.getCategories();
+					Set<String> collect = categories.stream().map(syndCategory -> syndCategory.getName()).collect(Collectors.toSet());
+					content.setCategories(collect);
+					List<SyndContentImpl> textList = (List<SyndContentImpl>) entry.getContents();
+					SyndContentImpl descr = (SyndContentImpl) entry.getDescription();
+					SyndContentImpl text;
+					if (textList.size() != 0) {
+						text= textList.get(0);
+					} else if(descr != null) {
+						text = descr;
+					} else {
+						text = new SyndContentImpl();
+						text.setValue("");
+					}
+					content.setText(text.getValue());
+					content.setUrl(entry.getLink());
+					content.setCreatedAt(entry.getPublishedDate());
+
 
 					Image image = new Image();
-					Document doc = Jsoup.connect(episode.getGUID()).get();
+					Document doc = Jsoup.connect(entry.getLink()).get();
 					String imageUrl = null;
 					Elements metaOgImage = doc.select("meta[property=og:image]");
 					if (metaOgImage!=null) {
@@ -132,10 +177,8 @@ public class RssService {
 							topicService.addContentToTopic(topicId, saved.getId());
 						}
 					}
-				} catch (MalformedFeedException | DateFormatException | MalformedURLException e) {
-					continue;
 				} catch (IOException e) {
-					e.printStackTrace();
+					continue;
 				}
 
 			}

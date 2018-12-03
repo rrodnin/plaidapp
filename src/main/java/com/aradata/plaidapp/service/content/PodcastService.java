@@ -22,6 +22,7 @@ import org.springframework.data.mongodb.gridfs.GridFsOperations;
 import org.springframework.data.mongodb.gridfs.GridFsResource;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -84,7 +85,11 @@ public class PodcastService {
 			try {
 				image.setUrl(episode.getITunesInfo().getImage().toString());
 			} catch (Exception e) {
-				image.setUrl(podcast.getImageURL().toString());
+				try {
+					image.setUrl(podcast.getImageURL().toString());
+				} catch (Exception e1) {
+					image.setUrl("");
+				}
 			}
 
 
