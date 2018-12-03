@@ -1,7 +1,6 @@
 package com.aradata.plaidapp.controller.content;
 
 import com.aradata.plaidapp.model.comments.Comment;
-import com.aradata.plaidapp.model.comments.CommentResponse;
 import com.aradata.plaidapp.model.content.AppConstants;
 import com.aradata.plaidapp.model.content.Content;
 import com.aradata.plaidapp.model.content.Type;
@@ -17,7 +16,6 @@ import com.aradata.plaidapp.service.content.ContentService;
 import com.aradata.plaidapp.service.content.ImageService;
 import com.aradata.plaidapp.service.content.PodcastService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.Resource;
 import org.springframework.http.HttpStatus;
