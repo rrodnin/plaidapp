@@ -57,4 +57,15 @@ public class YoutubeController {
 		service.updateQueries();
 		return ResponseEntity.ok().body(null);
 	}
+
+	@PostMapping("/updatePlaylists")
+	public ResponseEntity<?> updatePlaylist() throws IOException {
+		service.updatePlaylists();
+		return ResponseEntity.ok().body(null);
+	}
+
+	public ResponseEntity<?> updateVideos() throws IOException {
+		service.updateVideos();
+		return ResponseEntity.ok().body(null);
+	}
 }

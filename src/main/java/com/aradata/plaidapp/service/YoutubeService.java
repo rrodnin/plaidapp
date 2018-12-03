@@ -30,10 +30,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 @EnableScheduling
 @Service
@@ -60,6 +59,11 @@ public class YoutubeService {
 
 	@Autowired
 	private QueryRepository queryRepository;
+
+	DateTimeFormatter formatter = DateTimeFormatter
+			.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+			.withZone(ZoneId.of("UTC"));
+
 
 	@PostConstruct
 	public void init() {
@@ -178,6 +182,7 @@ public class YoutubeService {
 		content.getExtra().setYoutubeLikes(video.getStatistics().getLikeCount());
 		content.getExtra().setYoutubeDislikes(video.getStatistics().getDislikeCount());
 		content.getExtra().setYoutubeViews(video.getStatistics().getViewCount());
+		content.setCreatedAt(new Date(video.getSnippet().getPublishedAt().getValue()));
 		if (video.getSnippet().getTags() != null) {
 			content.setCategories(new HashSet<>(video.getSnippet().getTags()));
 		}
@@ -197,6 +202,24 @@ public class YoutubeService {
 
 
 
+//	@Scheduled(fixedRate = 5000000)
+	public void updatePubDate() throws IOException {
+		List<YoutubeVideo> all = repository.findAll();
+
+		for (YoutubeVideo video: all) {
+			Content content = service.findById(video.getContentId());
+			YouTube.Videos.List videos = youtube.videos().list("snippet,contentDetails,statistics");
+			videos.setId(video.getYoutubeId());
+			videos.setKey("AIzaSyBr8iJMOG76deZiPAYlwLXdNnkaLa6KE6I");
+			videos.setMaxResults(50L);
+			VideoListResponse execute = videos.execute();
+			Video update = execute.getItems().get(0);
+			content.setCreatedAt(new Date(execute.getItems().get(0).getSnippet().getPublishedAt().getValue()));
+
+			service.saveContent(content);
+
+		}
+	}
 
 //	@Scheduled(fixedRate = 600000)
 	public void updateVideos() throws IOException {
