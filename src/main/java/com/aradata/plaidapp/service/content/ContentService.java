@@ -20,18 +20,23 @@ import com.aradata.plaidapp.service.likes.LikeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
 @Service
+@EnableScheduling
 public class ContentService {
 
 	@Autowired
@@ -247,6 +252,21 @@ public class ContentService {
 
 		return new PagedResponse<>(responseList, contents.getNumber(), contents.getSize(),
 				contents.getTotalElements(), contents.getTotalPages());
+	}
+
+
+	@Scheduled(fixedRate = 600000)
+	public void validateContent() {
+		List<Content> all = repository.findAll();
+
+		for (Content content : all) {
+			try {
+				String url = content.getUrl();
+				URL ur = new URL(url);
+			} catch (MalformedURLException e) {
+				repository.delete(content);
+			}
+		}
 	}
 
 	public Content findById(String contentId) {

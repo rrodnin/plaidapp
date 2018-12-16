@@ -116,12 +116,15 @@ public class PodcastService {
 		for (PodcastFeed feed : all) {
 			Podcast podcast;
 			try {
-				podcast = new Podcast(feed.getUrl());
-			} catch (MalformedFeedException e) {
+				URL url = new URL(feed.getUrl());
+				podcast = new Podcast(url);
+			} catch (Exception e) {
+				e.printStackTrace();
 				continue;
 			}
 			for (Episode episode : podcast.getEpisodes()) {
 				try {
+					System.out.println(episode.getGUID());
 					if (service.existsByGuid(episode.getGUID()))
 						break;
 					Content content = new Content();
